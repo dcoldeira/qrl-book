@@ -1,0 +1,393 @@
+# The Causal Type Hierarchy
+
+Everything you have built so far — Bell states, GHZ states, cluster states, measurement patterns, compiled circuits — shares one silent assumption: **the order of operations is fixed before the program runs**. A measurement pattern executes round by round. A circuit applies gates left to right. Even adaptive corrections (Chapter 11), which depend on earlier outcomes, respect a definite order: the correction always comes *after* the measurement that determines it.
+
+This chapter asks the question that Part IV is built around: *what if the causal order itself could be quantum?*
+
+The answer is not science fiction. The **quantum switch** — a process in which the order of two operations is controlled by a qubit in superposition — has been realised experimentally many times since 2015. It is a genuine physical resource: it gives measurable advantages in channel discrimination, communication complexity, and thermodynamics. And yet:
+
+> **No existing quantum programming language can give the quantum switch a type.**
+
+Not because the languages are badly designed — because they are designed around a fixed causal skeleton. A circuit language *is* a data structure for definite causal order. To type the switch, causal structure itself has to become a first-class citizen of the type system.
+
+QRL does this with three types: `PM(n,d)`, `Switch(d)`, and `CausalDAG(n)`. This chapter explains what they mean, the mathematics underneath them (process matrices), and the key distinction the types encode: **causal separability versus causal nonseparability**. Chapter 14 then plays the game that makes the distinction operational, and Chapter 15 proves the theorem that ties it all together.
+
+## The Problem: A Program With No Type
+
+Here is the quantum switch as pseudocode:
+
+```
+switch(A, B, control):
+    if control is |0⟩:  apply A, then B
+    if control is |1⟩:  apply B, then A
+    if control is |+⟩:  ... both orders, coherently
+```
+
+The first two branches are ordinary programs. The third is not. When the control qubit is in superposition, the process applies $A$ before $B$ **and** $B$ before $A$ — not probabilistically (that would just be a coin flip between two ordinary programs) but *coherently*, in a way that can later interfere.
+
+Try to write this in a circuit language. A circuit is a list of gates; a list has an order. You can simulate the switch's *statistics* on a circuit machine (using an extra target copy and controlled-SWAPs), but the simulation is a different process — it uses more queries to $A$ and $B$ than the switch does, which is precisely why the switch gives query-complexity advantages. The object itself — "a process with no definite causal order between $A$ and $B$" — has no representation, and therefore no type.
+
+What would it even mean to type it? A type is a static guarantee. The type we want is:
+
+> `Switch(d)` — *the type of processes on a $d$-dimensional target that are causally nonseparable.*
+
+To make that precise we need the mathematical object that represents "a process without assuming a causal order". That object is the **process matrix**.
+
+## Process Matrices: Quantum Mechanics Without Global Order
+
+The process matrix framework (Oreshkov, Costa & Brukner, 2012 — hereafter OCB) starts from a deliberately minimal set of assumptions:
+
+1. There are $n$ **parties** (think: local laboratories), each of which receives a quantum system, acts on it with ordinary quantum mechanics, and sends a system out.
+2. **Locally**, quantum mechanics is exactly valid in each lab.
+3. **Globally** — and this is the departure — *no causal order between the labs is assumed*.
+
+Each party $k$ has an input Hilbert space $\mathcal{H}_{k_I}$ (the system entering the lab) and an output space $\mathcal{H}_{k_O}$ (the system leaving). Everything outside the labs — the wiring, the background causal structure, whatever routes systems between parties — is described by a single operator:
+
+$$
+W \;\in\; \mathcal{L}\!\left(\mathcal{H}_{1_I} \otimes \mathcal{H}_{1_O} \otimes \cdots \otimes \mathcal{H}_{n_I} \otimes \mathcal{H}_{n_O}\right)
+$$
+
+called the **process matrix**. If party $k$ performs an operation with Choi–Jamiołkowski representation $M_k$ (a completely positive map from $k_I$ to $k_O$), the probability of the joint outcome is given by a generalised Born rule:
+
+$$
+P(M_1, \ldots, M_n) \;=\; \mathrm{Tr}\!\left[ W \, \left(M_1 \otimes \cdots \otimes M_n\right) \right].
+$$
+
+For these numbers to be valid probabilities for *every* choice of local operations, $W$ must satisfy:
+
+| Condition | Statement | Meaning |
+|-----------|-----------|---------|
+| **Positivity** | $W \geq 0$ | probabilities are non-negative |
+| **Normalisation** | $\mathrm{Tr}[W] = \prod_k d_{k_O}$ | probabilities sum to 1 |
+| **No self-signalling** | $\mathrm{Tr}[W(M_1 \otimes \cdots \otimes M_n)] \in [0,1]$ for all CPTP instruments | no party signals to its own past |
+
+The first two are cheap linear-algebra checks. The third is the deep one — it is what rules out grandfather paradoxes while still permitting indefinite order — and verifying it in general requires characterising the allowed subspace of operators (an SDP in practice).
+
+Why is this the right generalisation? Because it contains everything you already know as special cases:
+
+- **A quantum state** is a process matrix for parties with trivial output spaces: nothing leaves the labs, the parties just measure. $W = \rho$ and the Born rule reduces to $\mathrm{Tr}[\rho\, M]$.
+- **A quantum channel** from Alice to Bob is a process matrix where Alice's output is wired into Bob's input. Definite order $A \prec B$, built in.
+- **A circuit** is a chain of such wirings — definite order all the way down.
+
+The framework's payoff is that it also contains process matrices that are *none of these* — valid $W$ operators compatible with local quantum mechanics that do not correspond to any fixed wiring diagram. The quantum switch is the canonical example.
+
+### Two processes you can write down
+
+The simplest valid process matrix is the **identity (no-signalling) process** — the parties share nothing:
+
+$$
+W_{\mathrm{id}} \;=\; \frac{1}{d_I^{\,n}}\; I
+$$
+
+Nobody can signal to anybody. It is the process-matrix analogue of the maximally mixed state.
+
+The canonical *causally ordered* process is the **channel from A to B** (OCB's equation 1). A's output is handed to B's input through an identity channel, represented by the (unnormalised) maximally entangled state $|\Phi^+\rangle = \tfrac{1}{\sqrt{d}}\sum_i |ii\rangle$ linking $A_O$ to $B_I$:
+
+$$
+W_{A \prec B} \;=\; \frac{I_{A_I}}{d} \;\otimes\; |\Phi^+\rangle\langle\Phi^+|_{A_O B_I} \;\otimes\; I_{B_O}
+$$
+
+A acts first and can signal to B; B cannot signal to A.
+
+## Process Matrices in QRL
+
+QRL represents these objects directly. `ProcessMatrix` carries the operator $W$, the party names, and the local dimensions — and it can check the OCB validity conditions:
+
+```{python}
+#| eval: false
+from qrl.causal import identity_process, definite_order_process
+import numpy as np
+
+# The no-signalling process for two qubit-parties
+W_id = identity_process(n_parties=2)
+
+W_id.is_positive_semidefinite()   # True   — condition 1
+W_id.is_normalized()              # True   — condition 2: Tr[W] = 2 × 2 = 4
+W_id.is_valid()                   # True
+np.trace(W_id.W).real             # 4.0
+```
+
+The definite-order process is a one-liner, and QRL can verify *structurally* which causal cone it lives in (using the projection characterisation of Araújo et al., which we meet properly below):
+
+```{python}
+#| eval: false
+W_AB = definite_order_process('AB')   # A acts first, signals to B
+
+W_AB.is_valid()                 # True
+W_AB.is_causally_ordered_AB()   # True  — lies in the A ≺ B subspace
+W_AB.is_causally_ordered_BA()   # False — B cannot signal to A
+```
+
+One structural fact worth pausing on: the identity process lies in **both** causal subspaces.
+
+```{python}
+#| eval: false
+W_id.is_causally_ordered_AB()   # True
+W_id.is_causally_ordered_BA()   # True
+```
+
+This is not a bug. "Compatible with $A \prec B$" means *B's marginal statistics don't depend on A's operation* — it does not require that A actually signals. A process with no signalling at all is trivially compatible with every order. Causal *order* is a constraint you can satisfy vacuously; that is exactly why the interesting notion is not "ordered" but **separable**, which we define next.
+
+## Causal Separability
+
+Suppose a process is not purely one order or the other, but a classical mixture: with probability $q$ the wiring is $A \prec B$, with probability $1-q$ it is $B \prec A$. Before each run, a coin is flipped and one definite order is realised. Whatever such a process can do, it can do with *pre-established* causal facts.
+
+::: {.callout-note}
+## Definition: causal separability
+A two-party process matrix $W$ is **causally separable** if it can be written as
+
+$$
+W \;=\; q\, W_{A \prec B} \;+\; (1-q)\, W_{B \prec A}, \qquad q \in [0,1],
+$$
+
+where $W_{A \prec B}$ and $W_{B \prec A}$ are valid processes compatible with the definite orders $A \prec B$ and $B \prec A$ respectively. A valid process matrix that admits no such decomposition is **causally nonseparable** (CNS).
+:::
+
+Causal nonseparability is the precise, order-theoretic analogue of entanglement. Compare:
+
+| | Entanglement | Causal nonseparability |
+|---|---|---|
+| Object | state $\rho$ | process $W$ |
+| "Classical" set | separable states $\sum_i p_i\, \rho_i^A \otimes \rho_i^B$ | causally separable processes $q W_{AB} + (1{-}q) W_{BA}$ |
+| Geometry | convex set | convex set |
+| Detection | entanglement witness | **causal witness** |
+| Certified by | Bell inequality violation | causal inequality / witness violation |
+
+The geometric point matters. The causally separable processes form a **convex set**: mixing two separable processes gives a separable process (flip another coin to decide which mixture you're in). Causal nonseparability is therefore a statement about lying *outside* a convex body — and, exactly as with entanglement, that is something **no single run can reveal**. Any individual run of any process yields one definite sequence of outcomes, perfectly consistent with *some* causal ordering. Nonseparability only shows up in the statistics, and you detect it the same way you detect entanglement: with a witness.
+
+### Causal witnesses
+
+Because the separable set is convex and closed, the hyperplane separation theorem guarantees that for every causally nonseparable $W$ there exists a Hermitian operator $\Omega$ — a **causal witness** (Araújo et al., 2015) — with:
+
+$$
+\mathrm{Tr}[\Omega\, W'] \;\geq\; 0 \quad \text{for every causally separable } W',
+\qquad
+\mathrm{Tr}[\Omega\, W] \;<\; 0.
+$$
+
+A negative expectation value is a certificate: this process is incompatible with any classical mixture of causal orders.
+
+QRL implements the witness built from the OCB causal game (the game itself is the whole of Chapter 14; here we only need the operator). Its expectation value on a process with game-winning probability $P_{\mathrm{win}}$ is $\mathrm{Tr}[\Omega W] = 3 - 4 P_{\mathrm{win}}$, so the separability threshold $\mathrm{Tr}[\Omega W] \geq 0$ is exactly the classical bound $P_{\mathrm{win}} \leq 3/4$:
+
+```{python}
+#| eval: false
+from qrl.causal import causal_nonseparability_witness
+
+Omega = causal_nonseparability_witness()   # Hermitian, 16 × 16 for two qubit-parties
+
+W_AB.witness_value(Omega)   # 0.5  ≥ 0  (P_win = 0.625)
+W_id.witness_value(Omega)   # 1.0  ≥ 0  (P_win = 0.5 — can't even use the one-way channel)
+```
+
+Both non-negative, as they must be — these are causally separable processes. And convex mixtures stay on the safe side of the hyperplane:
+
+```{python}
+#| eval: false
+from qrl.causal import ProcessMatrix
+
+q = 0.7
+W_mix = ProcessMatrix(
+    W=q * W_AB.W + (1 - q) * W_id.W,
+    parties=['A', 'B'],
+    input_dims=[2, 2],
+    output_dims=[2, 2],
+    description="mixture of A→B and the no-signalling process",
+)
+
+W_mix.is_valid()                # True
+W_mix.is_causally_separable()   # True
+W_mix.witness_value(Omega)      # 0.65 = 0.7 × 0.5 + 0.3 × 1.0  (linearity)
+```
+
+### The process that breaks the bound
+
+Now the quantum switch. For *unitary* channels $U_A$, $U_B$ on a $d$-dimensional target, the switch is the isometry
+
+$$
+V \;=\; (U_B U_A) \otimes |0\rangle\langle 0|_C \;+\; (U_A U_B) \otimes |1\rangle\langle 1|_C
+$$
+
+acting on target ⊗ control. Its process matrix is the (suitably normalised) Choi–Jamiołkowski operator of $V$ — a rank-one, *pure* process:
+
+```{python}
+#| eval: false
+from qrl.causal import QuantumSwitch, cptp_from_unitary
+import numpy as np
+
+sw = QuantumSwitch(
+    channel_A=cptp_from_unitary(np.eye(2)),
+    channel_B=cptp_from_unitary(np.eye(2)),
+)
+
+W_sw = sw.process_matrix()
+W_sw.is_valid()                  # True  — a perfectly legal process matrix
+W_sw.is_causally_separable()     # False — but not a mixture of causal orders
+
+sw.causal_inequality_value()     # 0.8535533905932737 = (2 + √2)/4  >  3/4
+```
+
+The switch wins the OCB game with probability $(2+\sqrt{2})/4 \approx 0.854$, so its witness value is
+
+$$
+\mathrm{Tr}[\Omega\, W_{\mathrm{sw}}] \;=\; 3 - 4 \cdot \frac{2+\sqrt{2}}{4} \;=\; 1 - \sqrt{2} \;\approx\; -0.414 \;<\; 0.
+$$
+
+Negative. Certificate delivered: no classical mixture of causal orders reproduces this process.
+
+How *far* outside the separable set is it? The **robustness** $r^*$ is the smallest amount of maximally mixed noise that drags $W$ back into the separable set — i.e. the smallest $r$ such that $\frac{W + r\, W_{\mathrm{id}}}{1+r}$ is causally separable:
+
+```{python}
+#| eval: false
+W_sw.causal_nonseparability_robustness()   # 0.4142135623730949  =  √2 − 1
+```
+
+$r^* = \sqrt{2} - 1$: the switch tolerates about 41% admixed noise before its causal nonseparability is washed out. (That these two numbers — the witness value $1-\sqrt 2$ and the robustness $\sqrt 2 - 1$ — are negatives of each other is not a coincidence; Chapter 14 derives both.)
+
+Note the *identity channels* in the construction: $U_A = U_B = I$. The causal nonseparability of the switch has nothing to do with what $A$ and $B$ compute — it is a property of the *wiring*, the process itself. Even "do nothing, twice, in a superposition of orders" is causally nonseparable.
+
+## QRL's Three Causal Types
+
+We now have the full mathematical cast. Here is how QRL turns it into a type system.
+
+$$
+\tau \;::=\; \cdots \;\mid\; \mathsf{PM}(n,d) \;\mid\; \mathsf{Switch}(d) \;\mid\; \mathsf{CausalDAG}(n)
+$$
+
+### `PM(n,d)` — the general process
+
+The type of $n$-party process matrices with local dimension $d$. Its introduction rule checks the cheap OCB conditions at the type level:
+
+$$
+\frac{W \in \mathbb{C}^{d^{2n} \times d^{2n}} \qquad W \geq 0 \qquad \mathrm{Tr}_{\mathrm{out}}(W) = I_{\mathrm{in}}}
+     {\Gamma \vdash \mathsf{pm}(W, \mathbf{p}) : \mathsf{PM}(n,d)}
+\;\;\textsc{(T-PM)}
+$$
+
+Everything in this chapter so far inhabits `PM(2,2)`: the identity process, $W_{A\prec B}$, the mixture, *and* the switch's process matrix. `PM(n,d)` is the ambient type — it promises validity, not causal structure.
+
+### `Switch(d)` — the certified causally nonseparable process
+
+The type of quantum switches on a $d$-dimensional target. Its introduction rule is where the physics enters the type system:
+
+$$
+\frac{\Gamma \vdash f : \mathsf{UniProc}(d) \qquad \Gamma \vdash g : \mathsf{UniProc}(d) \qquad \Gamma \vdash c : \mathsf{Qubit}}
+     {\Gamma \vdash \mathsf{switch}(f, g, c) : \mathsf{Switch}(d)}
+\;\;\textsc{(T-Switch)}
+$$
+
+The crucial premise is $\mathsf{UniProc}(d)$ — the channels must be **unitary**, not merely CPTP. This is not pedantry. For non-unitary channels, the physical switch decoheres into an *incoherent classical mixture* of the two orders — which is, by definition, causally separable. The API will happily build that object for you, but it gets type `PM(2,d)`, never `Switch(d)`. Unitarity is exactly the condition under which coherence between the orders survives, and the type rule enforces it statically.
+
+This is what makes `Switch(d)` a **certified** type. The claim — proved as the Soundness Theorem in Chapter 15 — is:
+
+$$
+\vdash e : \mathsf{Switch}(d) \quad \Longrightarrow \quad \llbracket e \rrbracket \in \mathrm{CNS}_{2,d}
+$$
+
+*Any term that type-checks as `Switch(d)` denotes a causally nonseparable process matrix.* The type checker is issuing a physics certificate.
+
+### `CausalDAG(n)` — definite order, made explicit
+
+The third type covers the opposite regime: processes whose causal structure is definite and *known*, given as a directed acyclic graph with quantum channels along the edges (the quantum causal models of Allen et al., 2017):
+
+$$
+\frac{V \text{ finite} \qquad (V, E) \text{ acyclic} \qquad \Phi : E \to \mathrm{CPTP}}
+     {\Gamma \vdash \mathsf{dag}(V, E, \Phi) : \mathsf{CausalDAG}(|V|)}
+\;\;\textsc{(T-DAG)}
+$$
+
+Why have this at all, if `PM(n,d)` already contains every definite-order process? Because the DAG supports operations that the bare process matrix does not expose — above all **intervention**. `CausalDAG(n)` is the type at which quantum analogues of Pearl's do-calculus live:
+
+```{python}
+#| eval: false
+from qrl.causal import QuantumCausalDAG, cptp_from_unitary
+import numpy as np
+
+# A three-node chain  Z → X → Y  with identity mechanisms
+plus = np.array([[0.5, 0.5], [0.5, 0.5]], dtype=complex)   # |+⟩⟨+|
+
+dag = QuantumCausalDAG("Z → X → Y chain")
+dag.add_node("Z", dim=2, prior=plus)
+dag.add_node("X", dim=2)
+dag.add_node("Y", dim=2)
+dag.add_channel("Z", "X", cptp_from_unitary(np.eye(2)))
+dag.add_channel("X", "Y", cptp_from_unitary(np.eye(2)))
+
+dag.observational_state("Y")
+# [[0.5, 0.5],      Y inherits |+⟩⟨+| from Z through the chain
+#  [0.5, 0.5]]
+
+dag.interventional_state("Y", {"X": np.array([[1, 0], [0, 0]], dtype=complex)})
+# [[1, 0],          do(X = |0⟩⟨0|) cuts the Z → X arrow:
+#  [0, 0]]          Y now sees only what we set X to
+```
+
+The intervention $\mathsf{do}(X = |0\rangle\langle 0|)$ severs $X$ from its causes and fixes its state; downstream, $Y$ changes accordingly. Observation and intervention disagree — the defining signature of causal (as opposed to merely statistical) structure. In QRL the interventional query has its own typing rule (`T-Do`), and it is only available at type `CausalDAG(n)`: intervention *requires* a definite causal arrow to cut.
+
+### The hierarchy — and a subtlety
+
+Putting the semantic domains side by side:
+
+$$
+\underbrace{\llbracket \mathsf{Switch}(d) \rrbracket}_{=\;\mathrm{CNS}_{2,d}}
+\;\subsetneq\;
+\llbracket \mathsf{PM}(2,d) \rrbracket
+\;\supsetneq\;
+\underbrace{\text{definite-order processes}}_{\text{incl. } \llbracket \mathsf{CausalDAG} \rrbracket \text{ semantics}}
+$$
+
+Every switch denotes a process matrix; strictly fewer process matrices are switches. So you might expect subtyping: `Switch(d) ≤ PM(2,d)`, with coercions in both directions where dimensions allow.
+
+QRL deliberately does **not** do this — and the direction that is missing matters. The inclusion above holds between *semantic domains*. At the *type* level there is no rule that produces a `Switch(d)` from a `PM(n,d)`: the types are not coercible. If they were, you could take any valid process matrix — say, the thoroughly separable $W_{A \prec B}$ — cast it to `Switch(d)`, and the certificate would be worthless. The only way to inhabit `Switch(d)` is through `T-Switch`, and `T-Switch` only accepts ingredients (unitary channels, a control qubit) from which causal nonseparability provably follows.
+
+This is the design pattern to take away from the chapter:
+
+> **A certified type is one whose introduction rules are the proof.** `Switch(d)` doesn't *assert* causal nonseparability; its typing rule makes anything else unconstructible.
+
+The same pattern appears elsewhere in programming languages — think of a `NonEmptyList` that can only be built from a head and a tail, or a `SortedList` whose only constructor is insertion — but here the invariant being certified is not a data-structure property. It is a statement about the causal structure of physical reality, checked by a compiler.
+
+## So What?
+
+Three types, one hierarchy, one design principle. What has it bought us?
+
+1. **The switch has a type.** The object that circuit languages cannot represent is a first-class value, and its defining physical property is a static guarantee rather than a runtime observation.
+
+2. **Causal structure is now part of a program's interface.** A function that demands `Switch(d)` *knows* — at compile time — that its argument is a genuinely indefinite-order resource. A function returning `CausalDAG(n)` advertises that interventions on its result are meaningful. `PM(n,d)` says: valid physics, no causal promises.
+
+3. **The distinctions are checkable.** Everything in this chapter ran against `qrl.causal`: validity conditions, cone membership, witness values, robustness, interventions. The type system's semantic claims are grounded in executable linear algebra, not just inference rules on paper.
+
+What we have *not* yet done is justify the two magic numbers that appeared: $P_{\mathrm{win}} = (2+\sqrt 2)/4$ and the classical bound $3/4$. They come from a game — a beautifully simple one — and playing it carefully is the whole of Chapter 14. The Soundness Theorem, which welds this chapter's types to that chapter's numbers, is Chapter 15.
+
+## Exercises
+
+**Exercise 1 — Validity conditions (warm-up).**
+Construct `identity_process(n_parties=3)` and predict $\mathrm{Tr}[W]$ before you run `is_normalized()`. Then break it: scale `W_id.W` by 2, rebuild the `ProcessMatrix`, and check which of the two validity conditions fails. Which OCB condition (positivity, normalisation, no-self-signalling) does *neither* of these checks cover, and why is it harder?
+
+**Exercise 2 — Witness arithmetic.**
+Using the relation $\mathrm{Tr}[\Omega W] = 3 - 4 P_{\mathrm{win}}$, verify by hand the three witness values computed in this chapter ($1.0$ for the identity process, $0.5$ for $W_{A \prec B}$, $1 - \sqrt 2$ for the switch) from their winning probabilities ($0.5$, $0.625$, $(2+\sqrt2)/4$). What winning probability corresponds to witness value exactly $0$, and what does that process sit on, geometrically?
+
+**Exercise 3 — Convexity, numerically.**
+Sweep $q$ from 0 to 1 in steps of 0.1 for the mixture $q\, W_{A\prec B} + (1-q)\, W_{\mathrm{id}}$ and record `witness_value(Omega)` at each step. Confirm linearity. Then argue (two or three sentences, no code) why *no* convex mixture of causally separable processes can ever have a negative witness value — which single property of the trace makes this inevitable?
+
+**Exercise 4 — Tensor orderings (a real pitfall).**
+`definite_order_process('BA')` returns a matrix that is numerically *identical* to `definite_order_process('AB')` — only the party labels differ (`['B','A']` vs `['A','B']`). Explain why. Then explain what would go wrong, physically, if you formed the "mixture" `0.5 * W_AB.W + 0.5 * W_BA.W` and interpreted it as $\frac12 W_{A\prec B} + \frac12 W_{B \prec A}$. What permutation of tensor factors would you need to apply to `W_BA.W` first?
+
+**Exercise 5 — Interventions and d-separation (harder).**
+Extend the chain example to a *common-cause* DAG: one root $Z$ with prior $|+\rangle\langle+|$ and two children $X \leftarrow Z \rightarrow Y$ (identity channels). (a) Compare `observational_state("Y")` before and after `interventional_state("Y", {"X": ...})` — why does intervening on $X$ now do *nothing* to $Y$? (b) Check your structural explanation with `is_d_separated`. (c) In the chain $Z \to X \to Y$, the same intervention changed $Y$ completely. State the general principle: for which graph structures does $\mathsf{do}(X)$ affect $Y$?
+
+## Next Steps
+
+You now hold the three causal types and the concept they hinge on — causal (non)separability, witnessed rather than observed. Next:
+
+- **Chapter 14: The OCB Causal Game** — where $3/4$ and $(2+\sqrt2)/4$ actually come from. The game, the classical bound and its proof, the switch strategy, and the three-line QRL program that computes it.
+- **Chapter 15: QuantumSwitch Soundness** — the theorem `⊢ e : Switch(d) ⟹ ⟦e⟧ ∈ CNS`, its proof, and why McBeth, Sabry, Heunen, and Dave — four serious quantum programming languages — cannot state it.
+
+**See also:**
+
+- [Chapter 2: Entanglement](02-entanglement.qmd) — the state-level analogue of everything here
+- [Chapter 12: Circuit Compilation](12-circuit-compilation.qmd) — the definite-order world this chapter generalises
+
+**References for this chapter:**
+
+- Oreshkov, Costa & Brukner (2012), *Quantum correlations with no causal order*, Nature Communications **3**, 1092 — the process matrix framework.
+- Araújo, Branciard, Costa, Feix, Giarmatzi & Brukner (2015), *Witnessing causal nonseparability*, New Journal of Physics **17**, 102001 — causal witnesses, the projection characterisation of causal cones, and robustness.
+- Allen, Barrett, Horsman, Lee & Spekkens (2017), *Quantum common causes and quantum causal models*, Physical Review X **7**, 031021 — the quantum causal models behind `CausalDAG(n)`.

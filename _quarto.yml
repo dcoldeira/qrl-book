@@ -37,7 +37,7 @@ book:
     - part: "Part IV: Causal Structure as a Programming Primitive"
       chapters:
         - chapters/12-circuit-compilation.qmd
-        - chapters/13-placeholder.qmd
+        - chapters/13-causal-type-hierarchy.qmd
         - chapters/14-placeholder.qmd
         - chapters/15-placeholder.qmd
 
