@@ -1,81 +1,76 @@
-# Welcome to The QRL Book {.unnumbered}
+# Welcome {.unnumbered}
 
-Learn quantum computing and Measurement-Based Quantum Computing (MBQC) using the **Quantum Relational Language** (QRL) - a relations-first approach to quantum programming.
+This book has one destination: understanding why the **quantum switch has a type**.
 
-## What You'll Learn
-
-This book teaches quantum computing from first principles, building up to advanced topics in MBQC and photonic quantum computing:
-
-- **Part I: Quantum Foundations** - Understand qubits, entanglement, and n-qubit systems
-- **Part II: MBQC Theory** - Learn cluster states, graph states, and measurement patterns
-- **Part III: QRL Programming** - Write quantum programs with hands-on tutorials
-- **Part IV: Advanced Topics** - Explore tensor networks, categorical quantum mechanics, and fault-tolerant QC
-
-## Why QRL?
-
-Unlike gate-based quantum languages (Qiskit, Cirq, Q#), QRL treats **quantum entanglement as a first-class primitive**, making it natural to express:
-
-- Cluster states for MBQC
-- Measurement patterns for photonic quantum computers
-- Relations-first quantum algorithms
-- Graph state compilation
-
-## Prerequisites
-
-- **Mathematics**: Linear algebra, complex numbers, basic probability
-- **Programming**: Python basics (QRL is implemented in Python)
-- **Physics**: Helpful but not required - we explain quantum mechanics from scratch
-
-## How to Use This Book
-
-### For Learners
-Start with Part I to build quantum foundations, then move through hands-on tutorials in Part III.
-
-### For Researchers
-Jump to Part II for MBQC theory or Part IV for advanced topics like tensor networks.
-
-### For Programmers
-Install QRL and dive into Part III tutorials - learn by doing!
-
-## Installation
-
-```bash
-pip install quantum-relational-language
-```
-
-See [Appendix: Installation](appendix/installation.qmd) for detailed setup instructions.
-
-## Code Examples
-
-All code in this book is:
-- **Executable** - Run examples directly in your Python environment
-- **Open source** - Available at [github.com/dcoldeira/quantum-relational-language](https://github.com/dcoldeira/quantum-relational-language)
-- **Tested** - Every example is verified to work with the latest QRL release
-
-## About the Author
-
-**David Coldeira** is a scientific software engineer with a BSc in Physics, specializing in quantum programming languages and MBQC. He developed QRL to explore relations-first approaches to quantum computing.
-
-- Email: dcoldeira@gmail.com
-- GitHub: [dcoldeira](https://github.com/dcoldeira)
-- Blog: [dcoldeira.github.io](https://dcoldeira.github.io)
-
-## Contributing
-
-Found a typo? Have a suggestion? Contributions are welcome!
-
-- **Issues**: [github.com/dcoldeira/qrl-book/issues](https://github.com/dcoldeira/qrl-book/issues)
-- **Pull requests**: [github.com/dcoldeira/qrl-book](https://github.com/dcoldeira/qrl-book)
-
-## License
-
-- **Text**: Creative Commons BY-SA 4.0
-- **Code**: MIT License (same as QRL)
+That sentence will not make sense yet. By Chapter 15, it will be the most natural thing in the world.
 
 ---
 
-**Let's begin!** Jump straight to hands-on tutorials:
-- [Chapter 7: Your First Bell State](chapters/07-first-bell-state.qmd)
-- [Chapter 8: Understanding GHZ States](chapters/08-ghz-states.qmd)
+## The idea in one paragraph
 
-(Foundational chapters 1-6 coming soon!)
+Every quantum programming language you have heard of — Qiskit, Cirq, Q#, QWIRE, even the most mathematically sophisticated typed quantum languages — shares one hidden assumption: operations happen in a fixed order. A comes before B, or B comes before A, and this is decided before the program runs. Quantum mechanics does not require this. There exist physical processes in which the causal order of operations is itself in quantum superposition — genuinely indefinite, not just unknown. No existing language can represent these processes, because none have a *type* for causal structure. QRL does.
+
+The central result of this book is the **QuantumSwitch Soundness Theorem**: any well-typed `switch(f, g, c)` expression in QRL denotes a *causally nonseparable* process matrix. The type system statically guarantees a property of physical reality. That is what types are for.
+
+---
+
+## What you will learn
+
+This book builds the result from scratch, in four parts:
+
+**Part I — Quantum Foundations** (Chapters 1–3)
+Qubits, entanglement, and n-qubit systems. The mathematical toolkit: state vectors, density matrices, tensor products, measurement. You need this before everything else.
+
+**Part II — Measurement-Based Quantum Computing** (Chapters 4–6)
+Cluster states, graph states, measurement patterns. This is how QRL compiles to photonic hardware. It is also the layer that sits *below* causal structure — understanding it makes the causal layer's position in the architecture clear.
+
+**Part III — QRL Programming** (Chapters 7–12)
+Hands-on: Bell states, GHZ states, graph extraction, pattern generation, adaptive corrections, circuit compilation. You will write real QRL programs and run them.
+
+**Part IV — Causal Structure as a Programming Primitive** (Chapters 13–15)
+The destination. Process matrices, the OCB causal game, the type hierarchy, and finally the Soundness Theorem with a full proof walkthrough. By Chapter 15 you will understand not just *what* the theorem says but *why* it holds and why no other language can even state it.
+
+---
+
+## Prerequisites
+
+- **Mathematics**: Linear algebra (vectors, matrices, eigenvalues), complex numbers, basic probability
+- **Programming**: Python basics — QRL is implemented in Python
+- **Physics**: Helpful but not required — quantum mechanics is developed from scratch in Part I
+
+---
+
+## How to use this book
+
+**If you want the full arc:** read linearly. Each part builds on the previous one.
+
+**If you already know quantum mechanics:** start at Chapter 4 (MBQC Foundations) or Chapter 7 (first QRL program).
+
+**If you want to go straight to the result:** read the paper first ([arXiv](https://github.com/entangledcode/qrl)), then use this book to understand the implementation and the mathematics behind the theorem.
+
+---
+
+## The code
+
+All code examples run against the QRL implementation:
+
+```bash
+pip install qrl
+```
+
+The implementation is ~13,600 lines of Python with 896 passing tests. Everything shown in this book is tested against that implementation.
+
+Source: [github.com/entangledcode/qrl](https://github.com/entangledcode/qrl)
+
+---
+
+## About the author
+
+**David Coldeira** is an independent researcher and scientific software engineer with a BSc in Physics. QRL is his primary research project — a quantum programming language in which causal structure is a first-class type-level primitive.
+
+- Email: dcoldeira@gmail.com
+- GitHub: [dcoldeira](https://github.com/dcoldeira)
+
+---
+
+*Let's begin.*

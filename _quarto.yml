@@ -4,7 +4,7 @@ project:
 
 book:
   title: "The QRL Book"
-  subtitle: "Learn Quantum Computing and MBQC with the Quantum Relational Language"
+  subtitle: "From Quantum Foundations to Causal Structure as a Programming Primitive"
   author: "David Coldeira"
   date: today
 
@@ -34,7 +34,7 @@ book:
         - chapters/10-pattern-generation.qmd
         - chapters/11-adaptive-corrections.qmd
 
-    - part: "Part IV: Advanced Topics"
+    - part: "Part IV: Causal Structure as a Programming Primitive"
       chapters:
         - chapters/12-circuit-compilation.qmd
         - chapters/13-placeholder.qmd
