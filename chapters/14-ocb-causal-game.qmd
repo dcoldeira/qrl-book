@@ -1,0 +1,226 @@
+# The OCB Causal Game
+
+Chapter 13 leaned on two numbers without earning them: the classical bound $P_{\mathrm{win}} \leq 3/4$, and the quantum switch's score $P_{\mathrm{win}} = (2+\sqrt{2})/4 \approx 0.854$. They are the numerical content of the whole causal type hierarchy — the gap between them is *why* `Switch(d)` deserves to be its own type. This chapter derives both.
+
+They come from a game. Oreshkov, Costa & Brukner introduced it in the same 2012 paper that gave us process matrices, and it plays the role for causal structure that the CHSH game plays for entanglement: a task with a sharp classical ceiling that a quantum resource provably beats.
+
+## The Rules
+
+Two laboratories, $A$ and $B$. In each round:
+
+1. A referee generates two independent uniform bits, $x$ and $y$. Bit $x$ is delivered to lab $A$, bit $y$ to lab $B$. Neither lab sees the other's bit.
+2. Each lab performs one local quantum operation — an instrument chosen in advance as a function of its own input bit — and reports a single output bit: $a$ from $A$, $b$ from $B$.
+3. The round is **won** if
+$$
+a \oplus b \;=\; x \wedge y .
+$$
+
+So for three of the four input pairs ($x\wedge y = 0$) the labs must produce **equal** bits; for $x = y = 1$ they must produce **different** bits. The score is the win probability averaged over the four equally likely inputs:
+$$
+P_{\mathrm{win}} \;=\; \tfrac{1}{4}\sum_{x,y \in \{0,1\}} P\big(a \oplus b = x\wedge y \,\big|\, x, y\big).
+$$
+
+Here is the twist that makes it a *causal* game rather than a nonlocality game. The two labs are not simply spacelike-separated with a shared state. They are embedded in a **process** — some background arrangement of wires, channels, and systems that routes quantum information between them. The labs agree in advance on their instruments and on that process. What they are *not* given is a definite causal order between $A$ and $B$: the process is allowed to be any valid process matrix.
+
+The question is exactly the question of Chapter 13, now made operational: **does having a definite causal order (or a classical mixture of orders) limit what the labs can score?**
+
+## Why Definite Order Caps the Score at 3/4
+
+Fix a definite causal order, say $A \prec B$: information may flow from $A$'s lab to $B$'s, never the reverse. (The $B \prec A$ case is identical by symmetry, and Chapter 13 established that a classical mixture of the two is a convex combination, so whatever bound holds for each order holds for the mixture.)
+
+The intuition is a see-saw. In the order $A \prec B$, lab $B$ is *downstream*: the system it operates on has already passed through $A$, so $B$'s statistics can be correlated with what $A$ did. Lab $A$ is *upstream*: nothing it touches has been near $B$, so $A$'s output cannot reflect $B$'s input $y$ in any way. Whatever coordination the win condition demands, at most one of the two labs can be adapting to the other; the other is working blind.
+
+Make this precise. Under $A \prec B$, lab $B$ cannot signal to lab $A$, so $A$'s output marginal is independent of $y$:
+$$
+P(a \mid x, y) \;=\; P(a \mid x).
+$$
+Now look at the win condition column by column:
+
+| $(x,y)$ | $x \wedge y$ | required relation |
+|---|---|---|
+| $(0,0)$ | $0$ | $a = b$ |
+| $(0,1)$ | $0$ | $a = b$ |
+| $(1,0)$ | $0$ | $a = b$ |
+| $(1,1)$ | $1$ | $a \neq b$ |
+
+The three "$a = b$" rows want the labs *correlated the same way*; the last row wants them *anti-correlated*. Consider the two rows with $x = 1$: $(1,0)$ needs $a = b$ and $(1,1)$ needs $a \neq b$, but $A$'s bit $a$ has the **same** distribution in both rows (it depends only on $x = 1$, not on $y$). So the burden of switching from "agree" to "disagree" falls entirely on $B$ — and $B$ must do it *knowing $y$ but not $x$*. When $B$ sees $y = 1$ it does not know whether it is in row $(0,1)$ (agree) or row $(1,1)$ (disagree). Any fixed response to $y=1$ therefore gets one of those two rows wrong.
+
+Carrying the bookkeeping through all four rows — a short calculation, or OCB's causal inequality applied to the cone characterisation from Chapter 13 — gives
+$$
+\boxed{P_{\mathrm{win}}^{\text{causally separable}} \;\leq\; \tfrac{3}{4}.}
+$$
+The bound is tight: with order $A \prec B$, let $A$ output $a = 0$ always and let $B$ output $b = 0$ when $y = 0$ and a fair coin when $y = 1$. Rows $(0,0)$, $(1,0)$ win outright; rows $(0,1)$, $(1,1)$ win with probability $1/2$ each. Average: $\tfrac14(1 + 1 + \tfrac12 + \tfrac12) = \tfrac34$.
+
+### Seeing the bound in QRL
+
+Chapter 13 met the causally ordered processes as `ProcessMatrix` values. Their game scores are computed directly by `causal_inequality_value()`:
+
+```{python}
+#| eval: false
+from qrl.causal import identity_process, definite_order_process
+
+identity_process(n_parties=2).causal_inequality_value()   # 0.5   — no signalling at all
+definite_order_process('AB').causal_inequality_value()    # 0.625 — one-way channel A → B
+```
+
+The no-signalling process cannot even use the "downstream" adaptation — $B$ learns nothing about $A$ — and scores a flat $1/2$, no better than answering at random. The one-way channel $A \prec B$ does better, $0.625$, by letting $B$ adapt to $A$; but it is still short of $3/4$ because these specific processes are not using the optimal instruments. What matters is that **every** causally separable process, with every choice of instruments, stays at or below $3/4$. That ceiling is the whole point.
+
+## The Switch Strategy
+
+Now embed the two labs in a **quantum switch** instead of a definite wiring. Recall its isometry (Chapter 13), for unitary operations $U_A, U_B$ on the target and a control qubit $C$:
+$$
+V \;=\; (U_B U_A) \otimes |0\rangle\langle 0|_C \;+\; (U_A U_B) \otimes |1\rangle\langle 1|_C .
+$$
+
+Set the control to $|+\rangle$. The process is now a *coherent superposition* of "$A$ then $B$" and "$B$ then $A$". Neither lab is downstream; neither is upstream; the amplitudes for the two orders are both present and can interfere.
+
+The labs' strategy is the one already coded into QRL's score operator:
+
+- **On input $0$**, measure the target in the $Z$ basis and report the outcome.
+- **On input $1$**, measure in the $X$ basis and report the outcome.
+
+Why this beats $3/4$: the two orders differ by whether $A$'s operation or $B$'s comes last, and $Z$ and $X$ measurements *do not commute*, so the order genuinely changes the target the other lab sees. With the control in $|+\rangle$, the win amplitude picks up a contribution from each order, and — exactly as in the CHSH derivation — the two contributions add constructively along a direction $45°$ between the axes. The interference term carries a factor $\cos(\pi/4) = 1/\sqrt2$, and the score becomes
+$$
+P_{\mathrm{win}} \;=\; \frac{1}{2} + \frac{1}{2\sqrt2} \;=\; \frac{2 + \sqrt2}{4} \;\approx\; 0.854 .
+$$
+
+The same $\sqrt2$ that sets Tsirelson's bound for CHSH sets the causal advantage here. It is not a coincidence: both are the operator norm of a sum of two anticommuting $\pm1$ observables.
+
+## Computing It in QRL
+
+Chapter 13 asserted the number; the surface language computes it. Three lines:
+
+```{.qrl filename="ocb.qrl"}
+let A : UniProc(2) = cptp([[1, 0], [0, 1]]) in   -- identity unitary
+let B : UniProc(2) = cptp([[1, 0], [0, 1]]) in   -- identity unitary
+switch(A, B, |+>)
+```
+
+```bash
+$ qrl exec ocb.qrl
+ocb.qrl  Process(2x2, P_win=0.8536, robustness=0.4142)
+```
+
+The program type-checks as `Switch(2)` — both operations are `UniProc(2)`, so `T-Switch` applies — and the interpreter takes the `E-Switch-Coherent` reduction, builds the switch process matrix, and scores it. Note the operations are *identity* unitaries: as Chapter 13 stressed, the causal advantage is a property of the process, not of what the labs compute.
+
+The same computation through the Python API, which exposes the intermediate objects:
+
+```{python}
+#| eval: false
+from qrl.causal import QuantumSwitch, cptp_from_unitary
+import numpy as np
+
+sw = QuantumSwitch(
+    channel_A=cptp_from_unitary(np.eye(2)),
+    channel_B=cptp_from_unitary(np.eye(2)),
+)
+
+sw.causal_inequality_value()   # 0.8535533905932737  = (2 + √2)/4
+```
+
+## The Score Operator
+
+`causal_inequality_value()` is not a Monte Carlo simulation of the game — it evaluates it in closed form. The game's entire payoff structure is packed into one Hermitian operator $S$, the **score operator**, built from the Choi–Jamiołkowski representations of the optimal instruments:
+
+$$
+S \;=\; \sum_{\substack{x,y,a,b \\ a \oplus b \,=\, x \wedge y}} J_A^{\,x,a} \otimes J_B^{\,y,b},
+$$
+
+where $J^{\,x,a}$ is the Choi operator of "measure in the $x$-basis, obtain outcome $a$". Summing over exactly the winning $(x,y,a,b)$ tuples means that for any process matrix $W$,
+$$
+P_{\mathrm{win}}(W) \;=\; \tfrac{1}{4}\,\mathrm{Tr}[\,W \, S\,].
+$$
+
+This is the generalised Born rule of Chapter 13 with $S$ in place of a product of local operations: the game score is *linear* in the process. That linearity is what turns the $3/4$ bound into a **witness**. Define
+$$
+\Omega \;=\; \tfrac{3}{4}\,I \;-\; S .
+$$
+Then for any valid two-party qubit process, which Chapter 13's normalisation condition fixes at $\mathrm{Tr}[W] = 4$,
+$$
+\mathrm{Tr}[\Omega\, W] \;=\; \tfrac{3}{4}\,\mathrm{Tr}[W] \;-\; \mathrm{Tr}[S\,W] \;=\; 3 \;-\; 4\,P_{\mathrm{win}}(W).
+$$
+The classical ceiling $P_{\mathrm{win}} \leq 3/4$ is exactly $\mathrm{Tr}[\Omega\, W] \geq 0$. This is the operator Chapter 13 called `causal_nonseparability_witness()`, and its non-negativity on causally separable processes is the OCB causal inequality in its sharpest form.
+
+```{python}
+#| eval: false
+from qrl.causal import causal_nonseparability_witness, identity_process, definite_order_process
+
+Omega = causal_nonseparability_witness()
+
+identity_process(n_parties=2).witness_value(Omega)    # 1.0   = 3 − 4(0.5)
+definite_order_process('AB').witness_value(Omega)     # 0.5   = 3 − 4(0.625)
+```
+
+Both non-negative — as they must be for causally separable processes. For the switch, the relation $\mathrm{Tr}[\Omega\, W] = 3 - 4P_{\mathrm{win}}$ gives
+$$
+\mathrm{Tr}[\Omega\, W_{\mathrm{sw}}] \;=\; 3 - 4\cdot\frac{2+\sqrt2}{4} \;=\; 1 - \sqrt2 \;\approx\; -0.414 \;<\; 0.
+$$
+Negative: the certificate of Chapter 13, now with its provenance. (The switch's process matrix is expressed over target $\otimes$ control rather than $A_I \otimes A_O \otimes B_I \otimes B_O$, so `witness_value` cannot be applied to it *directly* — but the linear relation is basis-independent, and `causal_inequality_value()` returns the score that feeds it.)
+
+## Robustness: How Far Outside the Bound
+
+A negative witness value says the switch is causally nonseparable. **Robustness** says by how much. It is the smallest fraction of maximally-mixed noise that, blended in, drags the process back onto the classical side:
+$$
+r^*(W) \;=\; \min\Big\{\, r \geq 0 \;:\; \frac{W + r\,W_{\mathrm{id}}}{1 + r}\ \text{is causally separable} \,\Big\}.
+$$
+
+Because the score is linear and $W_{\mathrm{id}}$ scores exactly $1/2$, the blended process scores
+$$
+P_{\mathrm{win}}\!\left(\frac{W + r\,W_{\mathrm{id}}}{1+r}\right) \;=\; \frac{P_{\mathrm{win}}(W) + r/2}{1 + r},
+$$
+and setting this equal to the threshold $3/4$ and solving for $r$ gives
+$$
+r^*(W) \;=\; 4\left(P_{\mathrm{win}}(W) - \tfrac{3}{4}\right)
+$$
+whenever $P_{\mathrm{win}}(W) > 3/4$, and $0$ otherwise. For the switch:
+$$
+r^* \;=\; 4\left(\frac{2+\sqrt2}{4} - \frac{3}{4}\right) \;=\; \sqrt2 - 1 \;\approx\; 0.414 .
+$$
+
+```{python}
+#| eval: false
+W_sw = sw.process_matrix()
+W_sw.causal_nonseparability_robustness()   # 0.4142135623730949  = √2 − 1
+```
+
+The switch tolerates roughly 41% admixed noise before its causal nonseparability is gone. And now the coincidence Chapter 13 flagged is explained: the witness value is $3 - 4P_{\mathrm{win}} = -(r^*)$ exactly, whenever the bound is exceeded. The two numbers $1 - \sqrt2$ and $\sqrt2 - 1$ are negatives of each other because they are the same linear function of $P_{\mathrm{win}}$, read with opposite sign.
+
+## So What?
+
+A gate-based language can compute every number in this chapter. Give it the switch isometry $V$, let it build the Choi operator, contract it with $S$, and it will print $0.8536$. The number is not the point.
+
+The point is the *type*. When `ocb.qrl` type-checks as `Switch(2)`, the compiler has certified — before any number is computed — that this process lies outside the causally separable set. `P_win > 3/4` is not a measured result to be checked against a threshold; it is a static consequence of the term having the type it has. That is the guarantee Chapter 15 makes precise and proves: the Soundness Theorem, which says the type checker's certificate is never wrong.
+
+## Exercises
+
+**Exercise 1 — The classical bound by hand.**
+Enumerate all deterministic strategies for the order $A \prec B$ in which $a$ depends only on $x$ and $b$ depends on $y$ and on $a$. There are few enough to list. Show that none exceeds $P_{\mathrm{win}} = 3/4$, and identify one that achieves it. Then explain in one sentence why allowing shared randomness cannot help.
+
+**Exercise 2 — Linearity of the score.**
+Using `causal_inequality_value()`, compute $P_{\mathrm{win}}$ for the mixtures $q\,W_{A\prec B} + (1-q)\,W_{\mathrm{id}}$ at $q = 0, 0.25, 0.5, 0.75, 1$ (build each with `ProcessMatrix`, as in Chapter 13). Confirm the results lie on the straight line $P_{\mathrm{win}}(q) = \tfrac12 + \tfrac18 q$. Which property of $\mathrm{Tr}[W S]$ forces this?
+
+**Exercise 3 — Robustness from the score.**
+Derive $r^* = 4(P_{\mathrm{win}} - 3/4)$ from scratch: write down the score of the noise-blended process, set it to the threshold $3/4$, solve for $r$. Then verify numerically that `W_sw.causal_nonseparability_robustness()` agrees with $4(\,$`W_sw.causal_inequality_value()`$ - 0.75)$.
+
+**Exercise 4 — Why $Z$ and $X$ (harder).**
+The switch strategy measures in the $Z$ basis on input $0$ and the $X$ basis on input $1$. Replace the $X$-basis choice with a measurement at angle $\theta$ from $Z$ in the $Z$–$X$ plane, and (using the API to rebuild the score operator, or by hand) find $P_{\mathrm{win}}(\theta)$. Show it is maximised at $\theta = \pi/2$ and that the maximum is $(2+\sqrt2)/4$. Where does the $\sqrt2$ enter?
+
+**Exercise 5 — A game the switch cannot win (open-ended).**
+The switch beats the classical bound for *this* win condition, $a \oplus b = x \wedge y$. Construct a different two-input, two-output win condition for which the quantum switch scores no better than the best causally ordered process. What feature of $a \oplus b = x \wedge y$ — think about which rows demand correlation versus anti-correlation — is the switch exploiting, and how would you design a predicate that removes it?
+
+## Next Steps
+
+You now have the gap: $3/4$ for anything with a definite causal order, $(2+\sqrt2)/4$ for the switch, and the robustness $\sqrt2 - 1$ measuring the distance between them.
+
+- **Chapter 15: QuantumSwitch Soundness** — the theorem that connects this gap to the type system. It states and proves $\vdash e : \mathsf{Switch}(d) \Rightarrow \llbracket e \rrbracket \in \mathrm{CNS}_{2,d}$: every well-typed switch term denotes a process on the far side of the $3/4$ bound. And it explains why McBeth, Sabry, Heunen, and Dave — four serious quantum programming languages — cannot even state it.
+
+**See also:**
+
+- [Chapter 13: The Causal Type Hierarchy](13-causal-type-hierarchy.qmd) — process matrices, causal separability, and the causal witness used here
+- [Chapter 2: Entanglement](02-entanglement.qmd) — the CHSH game, whose Tsirelson bound is the same $\sqrt2$
+
+**References for this chapter:**
+
+- Oreshkov, Costa & Brukner (2012), *Quantum correlations with no causal order*, Nature Communications **3**, 1092 — the causal game and the causal inequality.
+- Araújo, Branciard, Costa, Feix, Giarmatzi & Brukner (2015), *Witnessing causal nonseparability*, New Journal of Physics **17**, 102001 — the score operator, the witness, and the robustness measure.
+- Chiribella, D'Ariano, Perinotti & Valiron (2013), *Quantum computations without definite causal structure*, Physical Review A **88**, 022318 — the quantum switch as a higher-order operation.

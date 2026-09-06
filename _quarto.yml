@@ -38,7 +38,7 @@ book:
       chapters:
         - chapters/12-circuit-compilation.qmd
         - chapters/13-causal-type-hierarchy.qmd
-        - chapters/14-placeholder.qmd
+        - chapters/14-ocb-causal-game.qmd
         - chapters/15-placeholder.qmd
 
   appendices:
