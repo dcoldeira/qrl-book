@@ -10,6 +10,7 @@ book:
 
   repo-url: https://github.com/dcoldeira/qrl-book
   repo-actions: [edit, issue]
+  downloads: [pdf]
 
   chapters:
     - index.qmd
