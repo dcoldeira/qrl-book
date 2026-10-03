@@ -68,8 +68,15 @@ Source: [github.com/entangledcode/qrl](https://github.com/entangledcode/qrl)
 
 **David Coldeira** is an independent researcher and scientific software engineer with a BSc in Physics. QRL is his primary research project — a quantum programming language in which causal structure is a first-class type-level primitive.
 
-- Email: dcoldeira@gmail.com
+- Email: [david@entangledcode.dev](mailto:david@entangledcode.dev)
+- Website: [entangledcode.dev](https://entangledcode.dev)
 - GitHub: [dcoldeira](https://github.com/dcoldeira)
+
+---
+
+## License
+
+© 2026 David Coldeira. The text of this book is licensed under [Creative Commons Attribution-NonCommercial-ShareAlike 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) (CC BY-NC-SA 4.0). Code examples are licensed under the MIT License.
 
 ---
 

@@ -62,11 +62,14 @@ Found a typo? [Open an issue](https://github.com/dcoldeira/qrl-book/issues)
 ## Author
 
 **David Coldeira**
-- Email: dcoldeira@gmail.com
+- Email: [david@entangledcode.dev](mailto:david@entangledcode.dev)
+- Website: [entangledcode.dev](https://entangledcode.dev)
 - GitHub: [@dcoldeira](https://github.com/dcoldeira)
 - Blog: [dcoldeira.github.io](https://dcoldeira.github.io)
 
 ## License
 
-- **Text**: [Creative Commons BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+- **Text**: [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 - **Code examples**: [MIT License](LICENSE)
+
+You may read, share and adapt the text for non-commercial purposes, with attribution, under the same license. Commercial rights (including print and ebook editions) are reserved by the author. Versions published before this change remain available under CC BY-SA 4.0.
