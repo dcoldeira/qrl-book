@@ -25,6 +25,7 @@ jobs:
         uses: quarto-dev/quarto-actions/setup@v2
         with:
           version: 1.4.553
+          tinytex: true
 
       # PDF: needs TeX + the fonts used for glyph fallback (see _quarto.yml).
       # Failures here must not block the website, so these steps continue on error.
@@ -33,10 +34,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y fonts-lmodern fonts-dejavu-core fonts-noto-core fonts-symbola
-
-      - name: Install TinyTeX
-        continue-on-error: true
-        run: quarto install tinytex --no-prompt
 
       - name: Render PDF
         id: pdf
