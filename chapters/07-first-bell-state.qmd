@@ -11,6 +11,7 @@ $$
 $$
 
 This state has fascinating properties:
+
 - **Superposition**: Equal probability of measuring $|00\rangle$ or $|11\rangle$
 - **Perfect correlation**: If you measure qubit A as 0, qubit B will **always** be 0
 - **Maximal entanglement**: Entropy $S = 1.0$ (maximum for 2 qubits)

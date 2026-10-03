@@ -42,14 +42,17 @@ Proposed by Raussendorf and Briegel (2001), the one-way quantum computer operate
 ## One-Way QC Protocol
 
 **Step 1: Preparation**
+
 - Create a **cluster state** - a specific highly-entangled state on a lattice of qubits
 
 **Step 2: Measurement**
+
 - Measure qubits one-by-one in bases determined by:
   - The computation you want to perform
   - Outcomes of previous measurements (adaptive)
 
 **Step 3: Readout**
+
 - The remaining unmeasured qubits contain the result
 - Apply classical post-processing (Pauli corrections) based on measurement record
 
@@ -62,6 +65,7 @@ Proposed by Raussendorf and Briegel (2001), the one-way quantum computer operate
 ### Definition
 
 A **cluster state** is defined on a graph $G = (V, E)$ where:
+
 - Each vertex represents a qubit
 - Edges define entanglement
 
@@ -127,6 +131,7 @@ $$
 $$
 
 **Special cases:**
+
 - $\theta = 0$: X-basis ($|+\rangle, |-\rangle$)
 - $\theta = \frac{\pi}{2}$: Y-basis ($|+i\rangle, |-i\rangle$)
 - $\theta = \pi$: $-X$-basis
@@ -213,6 +218,7 @@ Recall quantum teleportation:
 If Alice measures in a **rotated** Bell basis, she effectively applies a gate during teleportation:
 
 **Modified protocol:**
+
 1. Bell pair $|\Phi^+\rangle_{23}$
 2. Alice rotates qubit 2 by $R(\theta)$ before Bell measurement
 3. Bob applies corrections
@@ -349,6 +355,7 @@ Explain how measuring Alice's qubit in the Hadamard basis (instead of computatio
 ### Exercise 4.4: Pattern Design {#exercise-4.4-pattern-design}
 
 Design a measurement pattern to implement a Hadamard gate on a 3-qubit chain cluster state. Specify:
+
 - Which qubit to measure first
 - Measurement basis
 - Any corrections needed

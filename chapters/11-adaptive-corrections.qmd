@@ -104,6 +104,7 @@ After XZ:  [0.+0.j -1.+0.j]
 ## Quantum Teleportation
 
 Quantum teleportation is the **canonical example** of adaptive corrections. It transfers a quantum state using only:
+
 - A shared Bell pair (entanglement)
 - Two classical bits (measurement outcomes)
 - Pauli corrections
@@ -127,6 +128,7 @@ Alice                           Bob
 ```
 
 **Steps:**
+
 1. Alice has input state $|\psi\rangle$ on qubit A
 2. Alice and Bob share Bell pair $|\Phi^+\rangle$ on qubits B, C
 3. Alice applies CNOT(A→B) then H(A)
@@ -465,30 +467,35 @@ Congratulations! You now understand:
 
 ### Exercise 1: Pauli Algebra
 Verify these Pauli identities using `apply_pauli_correction`:
+
 - $X^2 = I$ (applying X twice returns to original)
 - $Z^2 = I$
 - $XZ = -ZX$ (they anti-commute)
 
 ### Exercise 2: Teleportation Statistics
 Run teleportation 100 times on the same input state.
+
 - What fraction of runs require no correction?
 - What fraction require X only? Z only? Both?
 - Do these match the expected 25% each?
 
 ### Exercise 3: Phase States
 Teleport these phase states and verify fidelity:
+
 - $|+i\rangle = (|0\rangle + i|1\rangle)/\sqrt{2}$
 - $|-i\rangle = (|0\rangle - i|1\rangle)/\sqrt{2}$
 - $e^{i\pi/4}|0\rangle + e^{-i\pi/4}|1\rangle$
 
 ### Exercise 4: Correction Composition
 If you need to apply X then Z:
+
 - What single Pauli is equivalent?
 - Verify using `apply_pauli_correction`
 - Does the order matter (XZ vs ZX)?
 
 ### Exercise 5: Multi-Round Teleportation
 Implement "teleportation relay":
+
 1. Teleport from Alice to Bob
 2. Bob teleports to Charlie
 3. Verify Charlie has the original state
@@ -497,6 +504,7 @@ What's the total fidelity?
 
 ### Exercise 6: Error Analysis
 What happens if corrections are applied incorrectly?
+
 - Apply X when you should apply Z
 - Skip a required correction
 - Apply an unnecessary correction
@@ -505,12 +513,14 @@ Measure the fidelity in each case.
 
 ### Exercise 7: Custom Protocol
 Design a teleportation variant that uses $|\Psi^+\rangle = (|01\rangle + |10\rangle)/\sqrt{2}$ instead of $|\Phi^+\rangle$.
+
 - How do the corrections change?
 - Implement and verify it works.
 
 ## Next Steps
 
 You've mastered adaptive corrections! Next, you'll learn about:
+
 - **Pattern execution** - Simulating full MBQC patterns
 - **Pattern validation** - Cross-checking with circuit simulation
 - **Photonic backends** - Real hardware compilation
@@ -520,5 +530,6 @@ You've mastered adaptive corrections! Next, you'll learn about:
 **Next:** Chapter 12: Pattern Execution and Validation (coming soon)
 
 **See also:**
+
 - [Chapter 10: Measurement Pattern Generation](10-pattern-generation.qmd) - Pattern basics
 - [Chapter 6: Measurement Patterns Theory](06-measurement-patterns.qmd) - Theoretical background

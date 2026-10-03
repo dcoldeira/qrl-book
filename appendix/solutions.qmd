@@ -358,6 +358,7 @@ Given: $|\Psi^+\rangle = \frac{1}{\sqrt{2}}(|01\rangle + |10\rangle)$
 **(a)** Measure qubit A in Z-basis, outcome 0:
 
 The state has two terms:
+
 - $|01\rangle$: qubit A is in $|0\rangle$ ✓ (matches outcome)
 - $|10\rangle$: qubit A is in $|1\rangle$ ✗ (doesn't match)
 
@@ -398,6 +399,7 @@ $$
 **Step 2:** Apply CNOT gate (A = control, B = target)
 
 The CNOT gate flips qubit B if qubit A is $|1\rangle$:
+
 - $\text{CNOT}|00\rangle = |00\rangle$ (A=0, B unchanged)
 - $\text{CNOT}|10\rangle = |11\rangle$ (A=1, B flipped)
 
@@ -439,6 +441,7 @@ This is a key feature of GHZ states: only "all-zeros" or "all-ones" outcomes are
 **(b)** Measuring qubits 1 and 2 with outcomes 0 and 1:
 
 Check which terms in the GHZ state match this outcome:
+
 - $|0000\rangle$: qubit 1 = 0 ✓, qubit 2 = 0 ✗
 - $|1111\rangle$: qubit 1 = 1 ✗, qubit 2 = 1 ✓
 
@@ -609,6 +612,7 @@ Schmidt rank = 2 → **Entangled** ✓
 **Partition 2|13:**
 
 Grouping by qubit 2:
+
 - Qubit 2 = 0: $|000\rangle, |101\rangle$ → qubits 1,3 in $(|00\rangle + |11\rangle)$
 - Qubit 2 = 1: $|011\rangle, |110\rangle$ → qubits 1,3 in $(|01\rangle + |10\rangle)$
 
@@ -621,6 +625,7 @@ Schmidt rank = 2 → **Entangled** ✓
 **Partition 3|12:**
 
 Grouping by qubit 3:
+
 - Qubit 3 = 0: $|000\rangle, |110\rangle$ → qubits 1,2 in $(|00\rangle + |11\rangle)$
 - Qubit 3 = 1: $|011\rangle, |101\rangle$ → qubits 1,2 in $(|01\rangle + |10\rangle)$
 
@@ -651,6 +656,7 @@ This state has **maximal bipartite entanglement** for partition 1|23.
 **Experimental Design: Comparing GHZ and W State Robustness**
 
 **Setup:**
+
 1. Prepare many copies of $|\text{GHZ}_3\rangle = \frac{1}{\sqrt{2}}(|000\rangle + |111\rangle)$
 2. Prepare many copies of $|W_3\rangle = \frac{1}{\sqrt{3}}(|100\rangle + |010\rangle + |001\rangle)$
 3. Distribute qubits to three parties: Alice (qubit 1), Bob (qubit 2), Charlie (qubit 3)
@@ -660,11 +666,13 @@ This state has **maximal bipartite entanglement** for partition 1|23.
 Alice measures her qubit in the Z-basis, then Bob and Charlie test whether their qubits are still entangled.
 
 **For GHZ states:**
+
 - Alice measures 0 → Bob and Charlie have $|00\rangle$ (product state)
 - Alice measures 1 → Bob and Charlie have $|11\rangle$ (product state)
 - **Result:** Bob and Charlie share NO entanglement, regardless of Alice's outcome
 
 **For W states:**
+
 - Alice measures 1 (prob. 1/3) → Bob and Charlie have $|00\rangle$ (product state)
 - Alice measures 0 (prob. 2/3) → Bob and Charlie have $\frac{1}{\sqrt{2}}(|10\rangle + |01\rangle) = |\Psi^+\rangle$ (Bell state!)
 - **Result:** With probability 2/3, Bob and Charlie still share maximal entanglement
@@ -672,6 +680,7 @@ Alice measures her qubit in the Z-basis, then Bob and Charlie test whether their
 **Verification:**
 
 Bob and Charlie perform Bell inequality tests (CHSH) on their remaining qubits:
+
 - GHZ remnants: Always satisfy classical bounds (no entanglement)
 - W remnants: Violate Bell inequality 2/3 of the time (quantum entanglement preserved)
 
@@ -698,6 +707,7 @@ This is an equal superposition of all $n$ basis states with exactly one qubit in
 Let qubits $1, 2, \ldots, k$ be measured, and qubits $k+1, \ldots, n$ remain.
 
 The $|W_n\rangle$ state has $n$ terms. Each term has exactly one qubit in state $|1\rangle$:
+
 - Terms where the $|1\rangle$ is in positions $1, 2, \ldots, k$: These have at least one measured qubit = 1, so they don't survive the "all zeros" measurement.
 - Terms where the $|1\rangle$ is in positions $k+1, \ldots, n$: These have all measured qubits = 0, so they survive.
 
@@ -855,6 +865,7 @@ $$
 **How Hadamard-basis measurement applies H:**
 
 The key insight is that a Bell measurement can be decomposed as:
+
 - Apply $CNOT_{12}$ (qubit 1 controls qubit 2)
 - Apply $H$ to qubit 1
 - Measure both qubits in computational (Z) basis
@@ -915,6 +926,7 @@ $$
 **Explanation:**
 
 For a 3-qubit chain with both measurements in X-basis:
+
 - The first measurement "teleports" the input through the cluster
 - The second measurement applies the Hadamard transformation
 - The byproduct operators $X$ and $Z$ depend on measurement outcomes
@@ -937,16 +949,19 @@ Result: $H|\psi\rangle$ on qubit 2
 ### Solution 4.5: Resource Scaling {#solution-4-5}
 
 **Given:**
+
 - Circuit with depth $d$ and width $n$ requires approximately $d \cdot n$ qubits in MBQC
 - Grover's algorithm on $n$ qubits with $O(\sqrt{2^n})$ gates
 
 **Analysis:**
 
 Grover's algorithm parameters:
+
 - **Width:** $n$ qubits (the search space has $2^n$ elements)
 - **Total gates:** $O(\sqrt{2^n}) = O(2^{n/2})$
 
 To estimate depth, we need to consider parallelization:
+
 - Each Grover iteration applies an oracle and a diffusion operator
 - Number of iterations: $O(\sqrt{2^n})$
 - Gates per iteration: $O(n)$ (oracle and diffusion each use $O(n)$ gates)
@@ -970,6 +985,7 @@ Cluster size $\approx n \cdot \frac{2^{n/2}}{n} = O(2^{n/2}) = O(\sqrt{2^n})$
 **Practical estimate:**
 
 For typical Grover implementations:
+
 - $O(\sqrt{2^n})$ iterations
 - Each iteration has $O(\log n)$ to $O(n)$ depth
 
@@ -1039,6 +1055,7 @@ Verify that $K_2 = Z_1 X_2$ stabilizes $|G\rangle = \frac{1}{2}(|00\rangle + |01
 **Step 1: Apply $X_2$ first**
 
 $X_2$ flips the second qubit:
+
 - $X_2|00\rangle = |01\rangle$
 - $X_2|01\rangle = |00\rangle$
 - $X_2|10\rangle = |11\rangle$
@@ -1051,6 +1068,7 @@ $$
 **Step 2: Apply $Z_1$**
 
 $Z_1$ applies phase $-1$ when qubit 1 is $|1\rangle$:
+
 - $Z_1|00\rangle = |00\rangle$
 - $Z_1|01\rangle = |01\rangle$
 - $Z_1|10\rangle = -|10\rangle$
@@ -1075,6 +1093,7 @@ $$
 For the 4-qubit linear cluster state $1 — 2 — 3 — 4$:
 
 **Neighbors:**
+
 - $N(1) = \{2\}$
 - $N(2) = \{1, 3\}$
 - $N(3) = \{2, 4\}$
@@ -1083,15 +1102,16 @@ For the 4-qubit linear cluster state $1 — 2 — 3 — 4$:
 **Stabilizer generators** using the formula $K_i = X_i \prod_{j \in N(i)} Z_j$:
 
 $$
-\begin{align*}
+\begin{aligned}
 K_1 &= X_1 Z_2 \\
 K_2 &= Z_1 X_2 Z_3 \\
 K_3 &= Z_2 X_3 Z_4 \\
 K_4 &= Z_3 X_4
-\end{align*}
+\end{aligned}
 $$
 
 **Verification:** These four operators:
+
 - Are all Hermitian (equal to their conjugate transpose)
 - Square to identity: $K_i^2 = I$
 - Mutually commute: $K_i K_j = K_j K_i$ for all $i, j$
@@ -1128,6 +1148,7 @@ K_1 K_2 = (X_1 Z_2)(Z_1 X_2 Z_3) = (X_1 Z_1)(Z_2 X_2)(Z_3)
 $$
 
 Using $XZ = -ZX$ (anticommutation):
+
 - $X_1 Z_1 = iY_1$
 - $Z_2 X_2 = -iY_2$
 
@@ -1215,9 +1236,11 @@ This implies $X_1 = +1$ (eigenvalue of $|+\rangle$).
 **Step 2: Update stabilizers**
 
 From $K_1 = X_1 Z_2$ with $X_1 \to +1$:
+
 - New stabilizer: $Z_2$
 
 From $K_3 = Z_2 X_3$ (doesn't involve qubit 1):
+
 - Remains: $Z_2 X_3$
 
 **Step 3: Handle $K_2 = Z_1 X_2 Z_3$**
@@ -1300,6 +1323,7 @@ For a 2D cluster state simulating a circuit of depth $d$ on $n$ qubits, the clus
 **(a) Grover's algorithm on 10 qubits**
 
 **Parameters:**
+
 - Search space: $2^{10} = 1024$ elements
 - Number of Grover iterations: $O(\sqrt{2^{10}}) = O(32)$
 - Gates per iteration: $O(n) = O(10)$ (oracle + diffusion)
@@ -1314,6 +1338,7 @@ $$
 **(b) Quantum Fourier Transform on 20 qubits**
 
 **Parameters:**
+
 - Width: $n = 20$ qubits
 - Sequential depth: $O(n^2) = O(400)$ (naive implementation)
 - Parallelized depth: $O(n) = O(20)$ (with sufficient ancillas)
@@ -1407,6 +1432,7 @@ $$
 **Key insight:** The phase factor $e^{i\alpha}$ in the measurement basis directly translates to the rotation angle in the implemented gate.
 
 **Special cases:**
+
 - $\alpha = 0$: X-basis measurement → $R_Z(0) = I$ (identity, but with Hadamard effect from cluster)
 - $\alpha = \pi/2$: Y-basis measurement → $R_Z(\pi/2) = S$ (phase gate)
 - $\alpha = \pi$: $-X$-basis measurement → $R_Z(\pi) = Z$
@@ -1435,6 +1461,7 @@ This is CNOT followed by Hadamard on the target qubit.
 ```
 
 Where:
+
 - Qubit 1: Control input (encoded with $|\psi\rangle$)
 - Qubit 4: Target input (initialized to $|+\rangle$, represents $|0\rangle$ in computational basis)
 - Qubit 2: CNOT interaction ancilla
@@ -1450,6 +1477,7 @@ Where:
 | 4 | X-basis ($\theta = 0$) | $s_4$ |
 
 **Corrections:**
+
 - On qubit 3 (control output): $Z^{s_1}$
 - On qubit 5 (target output): $X^{s_2} Z^{s_4}$
 
@@ -1584,6 +1612,7 @@ The key insight: although the outcome is random, the **correction needed is alwa
 **Why this is "deterministic":**
 
 The term "deterministic" here means:
+
 - The correction formula is **fixed** (not dependent on the outcome in a complicated way)
 - The final state after correction is **always** $X|\psi\rangle$
 - There's no adaptation or feed-forward uncertainty
@@ -1608,6 +1637,7 @@ $$
 where $S = R_Z(\pi/2)$ is the phase gate.
 
 **Step 1: Identify gates**
+
 - $H$ on qubit 1
 - $CNOT$ with qubit 1 as control, qubit 2 as target
 - $S = R_Z(\pi/2)$ on qubit 1
@@ -1621,6 +1651,7 @@ where $S = R_Z(\pi/2)$ is the phase gate.
 ```
 
 **Vertex roles:**
+
 - 1: Input qubit 1 (holds $|\psi\rangle$)
 - 2: Ancilla for $H$ gate
 - 3: CNOT interaction vertex (connects control and target paths)
@@ -1638,6 +1669,7 @@ where $S = R_Z(\pi/2)$ is the phase gate.
 | 5 | CNOT target | X-basis ($\theta = 0$) | $s_5$ |
 
 **Adaptive angles:**
+
 - $\theta_2' = 0 + \pi \cdot s_1$
 - $\theta_3' = \pi/4 + \pi \cdot s_2$
 

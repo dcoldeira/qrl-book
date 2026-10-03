@@ -71,6 +71,7 @@ Measurement depth: 0
 ### Understanding the Pattern
 
 This pattern tells us:
+
 - **Prepare** 2 qubits in $|+\rangle$: `preparation=[0, 1]`
 - **Apply** 1 CZ gate: `entanglement=[(0, 1)]`
 - **No measurements** needed (this IS the prepared state)
@@ -212,6 +213,7 @@ Measurement: angle=0.785, plane=YZ
 ```
 
 **Axis mapping:**
+
 - X rotation → YZ plane
 - Y rotation → XZ plane
 - Z rotation → XY plane
@@ -542,6 +544,7 @@ Congratulations! You now understand:
 
 ### Exercise 1: Pattern Analysis
 Generate patterns for all Pauli gates (X, Y, Z) and compare:
+
 - Measurement angles
 - Measurement planes
 - Correction types
@@ -550,12 +553,14 @@ What pattern do you notice?
 
 ### Exercise 2: Measurement Depth
 Create a pattern that combines three gates: H, S, T.
+
 - What's the measurement depth?
 - How many qubits are needed?
 - How many measurements total?
 
 ### Exercise 3: Custom Rotation
 Generate a pattern for $R_Z(\pi/8)$ and verify:
+
 - The measurement plane is XY
 - The angle is $\pi/8$
 - There's 1 correction
@@ -563,12 +568,14 @@ Generate a pattern for $R_Z(\pi/8)$ and verify:
 ### Exercise 4: GHZ Scaling
 Generate GHZ patterns for n = 2, 3, 4, 5 qubits.
 For each, calculate:
+
 - Number of CZ gates
 - Graph density (edges / possible edges)
 - Resource efficiency (qubits vs entanglement)
 
 ### Exercise 5: Pattern Composer
 Write a function that:
+
 1. Takes a list of gate names: `["H", "X", "S"]`
 2. Generates a pattern for each gate
 3. Combines them sequentially
@@ -578,6 +585,7 @@ Test it with different gate sequences.
 
 ### Exercise 6: Pattern Validator
 Write a function that checks if a pattern is valid:
+
 - All measured qubits are prepared
 - All entanglement uses prepared qubits
 - No circular dependencies in measurements
@@ -597,6 +605,7 @@ cnot = generate_cnot_pattern()
 
 ### Exercise 8: Universal Circuit
 Build the pattern for a simple quantum circuit that creates a Bell state:
+
 1. Apply H to qubit 0
 2. Apply CNOT with control=0, target=1
 
@@ -604,6 +613,7 @@ Compare the total resources (qubits, measurements, depth) with `generate_bell_st
 
 ### Exercise 9: CZ vs CNOT
 Compare CZ and CNOT patterns:
+
 - Resource usage (qubits, measurements)
 - Why is CZ "native" but CNOT is not?
 - How would you implement CNOT using CZ and single-qubit gates?
@@ -611,6 +621,7 @@ Compare CZ and CNOT patterns:
 ## Next Steps
 
 You've mastered pattern generation! Next, you'll learn about:
+
 - **Adaptive corrections** - Implementing quantum teleportation (Phase 3)
 - **Pattern execution** - Simulating MBQC (Phase 4)
 - **Photonic compilation** - Real hardware backends (Future)
@@ -620,5 +631,6 @@ You've mastered pattern generation! Next, you'll learn about:
 **Next:** Chapter 11: Adaptive Corrections and Quantum Teleportation (coming soon)
 
 **See also:**
+
 - [Chapter 9: Graph Extraction](09-graph-extraction.qmd) - Foundation for patterns
 - [Chapter 6: Measurement Patterns Theory](06-measurement-patterns.qmd) - Theoretical background

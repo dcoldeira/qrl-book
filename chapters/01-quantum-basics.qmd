@@ -17,6 +17,7 @@ $$
 $$
 
 **Notation:** We use **Dirac notation** (or "bra-ket" notation):
+
 - $|0\rangle$ is pronounced "ket zero" - represents a column vector
 - $\langle 0|$ is pronounced "bra zero" - represents a row vector (conjugate transpose)
 
@@ -88,6 +89,7 @@ After measurement, the state **collapses** to the measured outcome.
 Consider the state $|+\rangle = \frac{1}{\sqrt{2}}(|0\rangle + |1\rangle)$.
 
 When measured in the Z-basis:
+
 - $P(0) = \left|\frac{1}{\sqrt{2}}\right|^2 = \frac{1}{2}$
 - $P(1) = \left|\frac{1}{\sqrt{2}}\right|^2 = \frac{1}{2}$
 
@@ -181,6 +183,7 @@ $$
 $$
 
 Now applying Born rule:
+
 - $P(+) = \left|\frac{1}{\sqrt{2}}\right|^2 = \frac{1}{2}$
 - $P(-) = \left|\frac{1}{\sqrt{2}}\right|^2 = \frac{1}{2}$
 
@@ -251,6 +254,7 @@ where $\theta \in [0, \pi]$ and $\phi \in [0, 2\pi)$.
 This parameterization maps quantum states to points on a **unit sphere** in 3D space called the **Bloch sphere**.
 
 **Key points on the Bloch sphere:**
+
 - **North pole** ($\theta=0$): $|0\rangle$
 - **South pole** ($\theta=\pi$): $|1\rangle$
 - **Equator** ($\theta=\pi/2$):
@@ -270,6 +274,7 @@ The Bloch sphere gives us geometric intuition about quantum states. Antipodal po
 So far we've discussed **pure states** - states with definite (though possibly superposed) quantum information.
 
 In reality, quantum systems often exist in **mixed states** due to:
+
 - Incomplete knowledge about the system
 - Interaction with the environment (decoherence)
 - Entanglement with other systems

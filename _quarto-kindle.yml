@@ -1,0 +1,33 @@
+# Kindle profile: typesets the PDF at e-reader screen size (Paperwhite, 1072x1448 @ 300 dpi).
+# Build with: quarto render --profile kindle --to pdf
+project:
+  output-dir: _book-kindle
+
+format:
+  pdf:
+    fontsize: 10pt
+    geometry:
+      - paperwidth=3.573in
+      - paperheight=4.827in
+      - margin=0.09in
+      - top=0.12in
+      - bottom=0.12in
+      - includehead=false
+      - includefoot=false
+    pagestyle: plain
+    include-in-header:
+      text: |
+        \usepackage{stmaryrd}
+        \directlua{luaotfload.add_fallback("qrlfallback",
+          {"DejaVu Sans:mode=harf;", "Noto Sans Math:mode=harf;", "Symbola:mode=harf;"})}
+        \setmainfont{Latin Modern Roman}[RawFeature={fallback=qrlfallback}]
+        \setsansfont{Latin Modern Sans}[RawFeature={fallback=qrlfallback}]
+        \setmonofont{DejaVu Sans Mono}[Scale=MatchLowercase, RawFeature={fallback=qrlfallback}]
+        % Small screen: wrap long code lines instead of letting them run off the page
+        \usepackage{fvextra}
+        \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,commandchars=\\\{\},fontsize=\footnotesize}
+        \RecustomVerbatimEnvironment{verbatim}{Verbatim}{breaklines,breakanywhere,fontsize=\footnotesize}
+        % No page numbers or running heads: the Kindle shows its own progress
+        \pagestyle{empty}
+        \renewcommand*{\chapterpagestyle}{empty}
+        \raggedbottom

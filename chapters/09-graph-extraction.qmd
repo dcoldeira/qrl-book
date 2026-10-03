@@ -5,11 +5,13 @@ Now that you've created Bell states and GHZ states, it's time to see how QRL con
 ## What is Graph Extraction?
 
 In MBQC, quantum computations are performed by:
+
 1. Preparing a **cluster state** (a special kind of graph state)
 2. Measuring qubits in specific bases
 3. Applying corrections based on measurement outcomes
 
 **Graph extraction** is the process of converting a QRL `QuantumRelation` into a graph representation where:
+
 - **Nodes** represent qubits (prepared in $|+\rangle$ state)
 - **Edges** represent CZ (controlled-Z) entangling gates
 
@@ -67,6 +69,7 @@ graph = extract_graph(relation)
 ```
 
 **Returns:** A NetworkX `Graph` object with:
+
 - Nodes: qubit indices (0, 1, 2, ...)
 - Edges: CZ operations needed to create the cluster state
 - Metadata: state type, number of qubits, description
@@ -287,6 +290,7 @@ Why does a Bell state become an edge graph?
 ```
 
 **State evolution:**
+
 1. Start: $|+\rangle \otimes |+\rangle$
 2. Apply CZ between qubits 0-1
 3. Result: Graph state with topology `0 ━━━ 1`
@@ -378,6 +382,7 @@ Congratulations! You now understand:
 
 ### Exercise 1: Bell State Verification
 Create all four Bell states and verify they all produce edge graphs:
+
 - $|\Phi^+\rangle = \frac{|00\rangle + |11\rangle}{\sqrt{2}}$ (default)
 - $|\Phi^-\rangle = \frac{|00\rangle - |11\rangle}{\sqrt{2}}$
 - $|\Psi^+\rangle = \frac{|01\rangle + |10\rangle}{\sqrt{2}}$
@@ -387,6 +392,7 @@ Do they all produce the same graph topology?
 
 ### Exercise 2: GHZ Scaling
 Create GHZ states with 2, 3, 4, and 5 qubits. For each:
+
 - Extract the graph
 - Count nodes and edges
 - Verify the star topology
@@ -396,6 +402,7 @@ Create GHZ states with 2, 3, 4, and 5 qubits. For each:
 
 ### Exercise 3: Graph Properties
 For a Bell state graph:
+
 - Calculate the degree of each node
 - Check if the graph is connected
 - Compute the diameter of the graph
@@ -415,6 +422,7 @@ w3 = program.entangle(q0, q1, q2, state_type="w")
 
 ### Exercise 5: Custom Analysis
 Write a function that:
+
 1. Takes a `QuantumRelation` as input
 2. Extracts the graph
 3. Returns a dictionary with:
@@ -429,6 +437,7 @@ Test it on Bell, GHZ₃, and W states.
 ## Next Steps
 
 You've mastered graph extraction! Next, you'll learn how to:
+
 - Generate **measurement patterns** from graphs (Phase 2)
 - Understand **adaptive corrections** for measurement outcomes
 - Compile complete QRL programs to MBQC
@@ -438,5 +447,6 @@ You've mastered graph extraction! Next, you'll learn how to:
 **Next:** Chapter 10: W States and Entanglement Classes (coming soon)
 
 **See also:**
+
 - [Chapter 5: Cluster States](05-cluster-states.qmd) - Theoretical foundation
 - [Chapter 6: Measurement Patterns](06-measurement-patterns.qmd) - What comes next

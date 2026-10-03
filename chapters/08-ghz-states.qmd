@@ -72,6 +72,7 @@ Entanglement entropy: 1.000
 ```
 
 Notice:
+
 - State vector has $2^3 = 8$ components (8-dimensional Hilbert space)
 - Entropy is still 1.0 (maximal for 1-vs-2 split)
 
@@ -263,6 +264,7 @@ This is different from some other entangled states (like W states, which we'll s
 GHZ states provide the **strongest violation of local realism** (even stronger than Bell states).
 
 Consider this scenario:
+
 1. Create a 3-qubit GHZ state
 2. Send each qubit to Alice, Bob, and Charlie (far apart)
 3. Each measures in X or Y basis
@@ -351,6 +353,7 @@ As you add more qubits, the state vector grows exponentially:
 - **30 qubits: 1,073,741,824 complex numbers (8 GB!)**
 
 For large systems, you'll need:
+
 - **Tensor networks** (MPS/PEPS) - efficient approximations
 - **Stabilizer formalism** - exact for certain states (including GHZ!)
 - **MBQC compilation** - Convert to measurement patterns
@@ -380,6 +383,7 @@ Congratulations! You now understand:
 
 ### Exercise 1: Verify 4-Qubit GHZ
 Create a 4-qubit GHZ state and verify:
+
 - State vector has correct form
 - All 4 qubits show perfect correlation (100 trials)
 - Entropy is 1.0
@@ -391,6 +395,7 @@ Hint: Use `QuestionType.SPIN_X`
 
 ### Exercise 3: GHZ State Distribution
 Run 1000 trials of GHZ measurement. Count how many times you get:
+
 - All 0s: `000`
 - All 1s: `111`
 - Mixed: anything else
@@ -399,6 +404,7 @@ Plot a histogram. What distribution do you expect?
 
 ### Exercise 4: Sequential Partial Measurements
 Start with 4-qubit GHZ. Measure qubits one by one:
+
 1. Measure qubit 0 → observe state collapse
 2. Measure qubit 1 → observe further collapse
 3. Measure qubit 2 → what happens to entropy?
@@ -408,6 +414,7 @@ Track the entropy at each step.
 
 ### Exercise 5: Large GHZ State
 Create the largest GHZ state your computer can handle:
+
 - Try 10, 15, 20 qubits
 - Measure memory usage
 - What's your practical limit?
@@ -432,6 +439,7 @@ Mathematically: GHZ states belong to a different **entanglement class** under LO
 ### Application: Quantum Secret Sharing
 
 GHZ states enable **quantum secret sharing**:
+
 - Alice has a secret bit
 - Encodes it in a GHZ state shared with Bob and Charlie
 - **Any 2 of the 3** can reconstruct the secret
@@ -442,6 +450,7 @@ This is impossible classically without trusted parties!
 ### Connection to MBQC
 
 GHZ states are **resource states** for measurement-based quantum computing:
+
 - Create large GHZ state
 - Measure qubits in chosen bases
 - Measurement pattern implements quantum algorithm

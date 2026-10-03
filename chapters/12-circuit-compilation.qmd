@@ -314,6 +314,7 @@ Why is there such a big difference between compiled and direct patterns?
 ### Naive Compilation
 
 Naive compilation treats each gate independently:
+
 - H gate: 2 qubits, 1 measurement
 - CNOT gate: 4 qubits, 2 measurements
 - Total: 6 qubits, 3 measurements
@@ -321,6 +322,7 @@ Naive compilation treats each gate independently:
 ### Direct Pattern
 
 The direct Bell state pattern recognizes that:
+
 - Bell state = CZ on two $|+\rangle$ qubits
 - No measurements needed!
 - Total: 2 qubits, 0 measurements
@@ -622,6 +624,7 @@ SWAP = CNOT(0,1) - CNOT(1,0) - CNOT(0,1)
 ### Exercise 2: Resource Comparison
 
 Create circuits for:
+
 - 4-qubit GHZ state (H + 3 CNOTs)
 - 5-qubit GHZ state (H + 4 CNOTs)
 
@@ -630,6 +633,7 @@ Compare compiled resources with `generate_ghz_state_pattern(n)`.
 ### Exercise 3: Parallel Circuit
 
 Design a circuit with maximum parallelism:
+
 - 4 qubits
 - Apply H to all qubits (parallel)
 - Apply CZ between pairs (0,1) and (2,3) (parallel)
@@ -640,6 +644,7 @@ What's the theoretical minimum depth?
 ### Exercise 4: Rotation Circuit
 
 Create a circuit that applies:
+
 - $R_X(\pi/4)$ to qubit 0
 - $R_Y(\pi/3)$ to qubit 1
 - $R_Z(\pi/6)$ to qubit 2
@@ -649,6 +654,7 @@ All in parallel. Compile and verify the measurement angles match the rotations.
 ### Exercise 5: Teleportation Analysis
 
 Using the teleportation circuit:
+
 1. Compile it to a pattern
 2. Count the total resources
 3. Compare with the direct teleportation pattern from Chapter 11
@@ -680,6 +686,7 @@ Test it on a circuit where gates can be reordered.
 ### Exercise 8: Resource Predictor
 
 Extend `estimate_resources` to also predict:
+
 - Measurement depth (longest chain)
 - Memory usage (peak qubits alive)
 - Classical communication (for corrections)
@@ -697,5 +704,6 @@ You've learned circuit compilation! Next chapters will cover:
 **Next:** Chapter 13: QRL Language Syntax (coming soon)
 
 **See also:**
+
 - [Chapter 10: Pattern Generation](10-pattern-generation.qmd) - Individual gate patterns
 - [Chapter 11: Adaptive Corrections](11-adaptive-corrections.qmd) - Correction mechanics

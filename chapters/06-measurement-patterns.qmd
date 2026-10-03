@@ -9,6 +9,7 @@ The power of MBQC lies in its ability to simulate any quantum circuit using only
 **Given:** A quantum circuit with gates $U_1, U_2, \ldots, U_d$ acting on $n$ qubits
 
 **Goal:** Find a measurement pattern that:
+
 1. Prepares a cluster state
 2. Measures qubits in specific bases
 3. Applies corrections
@@ -27,6 +28,7 @@ Every gate in MBQC is implemented via **gate teleportation** - a generalization 
 **Setup:** Alice and Bob share $|\Phi^+\rangle_{23} = \frac{1}{\sqrt{2}}(|00\rangle + |11\rangle)$
 
 **Protocol:**
+
 1. Alice has input $|\psi\rangle_1$
 2. Alice performs Bell measurement on qubits 1-2 → outcomes $(s_x, s_z)$
 3. Bob applies $X^{s_x} Z^{s_z}$ to qubit 3
@@ -44,6 +46,7 @@ $$
 where $U$ is the gate we want to apply.
 
 **Protocol:**
+
 1. Alice performs Bell measurement → outcomes $(s_x, s_z)$
 2. Bob applies corrections $X^{s_x} Z^{s_z}$
 3. Result: $U|\psi\rangle$ appears on Bob's qubit!
@@ -80,6 +83,7 @@ The gate $U$ has been applied! $\square$
 For rotation gates $R_\alpha(\theta) = e^{-i\theta \alpha/2}$ where $\alpha \in \{X, Y, Z\}$:
 
 **MBQC implementation:**
+
 1. Add ancilla qubit in state $|+\rangle$
 2. Entangle with $CZ$
 3. Measure ancilla in basis $|\pm_\theta\rangle = \frac{1}{\sqrt{2}}(|0\rangle \pm e^{i\theta}|1\rangle)$
@@ -90,14 +94,17 @@ For rotation gates $R_\alpha(\theta) = e^{-i\theta \alpha/2}$ where $\alpha \in 
 ### Pauli Gates
 
 **$X$ gate:**
+
 - Measure in Z-basis ($\theta = \pi$)
 - Always apply $X$ correction (deterministic)
 
 **$Z$ gate:**
+
 - Measure in X-basis ($\theta = 0$)
 - Always apply $Z$ correction (deterministic)
 
 **$Y$ gate:**
+
 - Measure in basis at $\theta = \frac{\pi}{2}$
 - Apply both $X$ and $Z$ corrections
 
@@ -106,6 +113,7 @@ For rotation gates $R_\alpha(\theta) = e^{-i\theta \alpha/2}$ where $\alpha \in 
 **Circuit:** $H$
 
 **MBQC pattern:**
+
 1. Measure in X-basis ($\theta = 0$)
 2. If outcome is 1, apply $Z$ correction
 
@@ -116,6 +124,7 @@ For rotation gates $R_\alpha(\theta) = e^{-i\theta \alpha/2}$ where $\alpha \in 
 **Circuit:** $S = \begin{pmatrix} 1 & 0 \\ 0 & i \end{pmatrix}$
 
 **MBQC pattern:**
+
 1. Measure in basis $|\pm_{\pi/4}\rangle$
 2. Apply $Z$ correction based on outcome
 
@@ -127,6 +136,7 @@ U = e^{i\alpha} R_Z(\beta) R_Y(\gamma) R_Z(\delta)
 $$
 
 **MBQC implementation:**
+
 - 3 ancilla qubits (one per rotation)
 - Measure each at appropriate angle
 - Chain corrections through the pattern
@@ -149,16 +159,19 @@ Cluster:  c' — a — t'
 ```
 
 where:
+
 - $c, t$ are input qubits (control, target)
 - $c', t'$ are output qubits
 - $a$ is ancilla
 
 **Measurements:**
+
 1. Measure $c$ in X-basis → outcome $s_c$
 2. Measure $a$ in X-basis → outcome $s_a$
 3. Measure $t$ in X-basis → outcome $s_t$
 
 **Corrections:**
+
 - Apply $Z^{s_c}$ to $c'$
 - Apply $X^{s_a}$ to $t'$
 - Apply $Z^{s_t}$ to $t'$
@@ -177,10 +190,12 @@ c    t
 ```
 
 **Measurements:**
+
 1. Measure $c$ in X-basis → outcome $s_c$
 2. Measure $t$ in X-basis → outcome $s_t$
 
 **Corrections:**
+
 - Apply $Z^{s_c}$ to $t'$
 - Apply $Z^{s_t}$ to $c'$
 
@@ -193,25 +208,30 @@ c    t
 **Input:** Quantum circuit on $n$ qubits with $d$ layers of gates
 
 **Step 1: Circuit Decomposition**
+
 - Decompose all gates into: $\{H, R_Z(\theta), CNOT\}$ (universal gate set)
 - Organize into layers (gates that can be applied in parallel)
 
 **Step 2: Graph Construction**
+
 - Create linear cluster for each qubit: $n$ chains of length $d+1$
 - Add connections between chains for CNOT gates
 - Result: 2D cluster state of size $\sim n \times d$
 
 **Step 3: Assign Measurement Angles**
+
 - For each gate, assign measurement basis to corresponding ancilla
 - Single-qubit rotations → measurement angle = rotation angle
 - Hadamard → X-basis measurement
 - CNOT → X-basis measurements with appropriate corrections
 
 **Step 4: Determine Dependencies**
+
 - Identify feed-forward: which measurements depend on previous outcomes
 - Chain corrections: later measurements depend on earlier outcomes
 
 **Step 5: Generate Pattern**
+
 - Output: List of measurements with angles and dependencies
 - Corrections specified as functions of previous outcomes
 
@@ -225,6 +245,7 @@ c    t
 ```
 
 **Step 1: Decomposition**
+
 - Already in $\{H, CNOT\}$
 
 **Step 2: Cluster Graph**
@@ -235,17 +256,20 @@ c    t
 ```
 
 where:
+
 - 1a: input qubit 1 ($|\psi\rangle$)
 - 2a: input qubit 2 ($|0\rangle$)
 - 1b: ancilla for $H$
 - 1c, 2b: ancillas for $CNOT$
 
 **Step 3: Measurements**
+
 - Measure 1a in X-basis (for $H$) → $s_1$
 - Measure 1b in X-basis → $s_2$ (depends on $s_1$)
 - Measure 2a in X-basis → $s_3$
 
 **Step 4: Corrections**
+
 - On 1c: apply $Z^{s_1} X^{s_2}$
 - On 2b: apply $Z^{s_3}$
 
@@ -304,6 +328,7 @@ $$
 ### Classical Post-Processing
 
 These corrections can be applied:
+
 1. **Physically:** Apply actual $X$ and $Z$ gates at the end
 2. **Classically:** Track corrections and flip interpretation of final measurement outcomes
 
@@ -316,6 +341,7 @@ These corrections can be applied:
 **Goal:** Use fewest qubits possible
 
 **Techniques:**
+
 1. **Gate cancellation:** Simplify circuit before compilation
 2. **Parallel gates:** Merge gates acting on different qubits
 3. **Native gates:** Use $CZ$ instead of $CNOT$ when possible (saves ancillas)
@@ -329,6 +355,7 @@ These corrections can be applied:
 **Goal:** Minimize measurement depth to reduce latency
 
 **Techniques:**
+
 1. **Parallelize independent measurements**
 2. **Reorder circuit layers** to reduce dependencies
 3. **Trade space for time:** Use more qubits to enable parallel measurements
@@ -447,6 +474,7 @@ In this chapter, you learned:
 ### Exercise 6.1: Hadamard Compilation {#exercise-6.1-hadamard-compilation}
 
 Write out the complete measurement pattern for implementing a Hadamard gate, including:
+
 - Cluster preparation commands
 - Measurement command with basis
 - Correction commands
@@ -508,6 +536,7 @@ where $S = R_Z(\pi/2)$ is the phase gate.
 **Congratulations!** You've completed Parts I and II - the full theoretical foundation for quantum computing and MBQC.
 
 **Next steps:**
+
 - Revisit **[Part III: QRL Programming](../index.qmd#part-iii-qrl-programming)** with your new theoretical understanding
 - Explore **Part IV: Advanced Topics** (Chapters 12-15) when ready
 

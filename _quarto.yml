@@ -45,7 +45,6 @@ book:
     - appendix/installation.qmd
     - appendix/api-reference.qmd
     - appendix/solutions.qmd
-    - references.qmd
 
 bibliography: references.bib
 
@@ -62,6 +61,16 @@ format:
 
   pdf:
     documentclass: scrbook
+    pdf-engine: lualatex
+    include-in-header:
+      text: |
+        \usepackage{stmaryrd}
+        % Glyph fallback: box drawing, Greek, kets, check marks in text and code
+        \directlua{luaotfload.add_fallback("qrlfallback",
+          {"DejaVu Sans:mode=harf;", "Noto Sans Math:mode=harf;", "Symbola:mode=harf;"})}
+        \setmainfont{Latin Modern Roman}[RawFeature={fallback=qrlfallback}]
+        \setsansfont{Latin Modern Sans}[RawFeature={fallback=qrlfallback}]
+        \setmonofont{DejaVu Sans Mono}[Scale=MatchLowercase, RawFeature={fallback=qrlfallback}]
     toc: true
     number-sections: true
     colorlinks: true

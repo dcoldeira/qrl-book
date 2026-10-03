@@ -41,6 +41,7 @@ $$
 $$
 
 **Examples:**
+
 - $n=2$: $|\text{GHZ}_2\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |11\rangle) = |\Phi^+\rangle$ (Bell state)
 - $n=3$: $|\text{GHZ}_3\rangle = \frac{1}{\sqrt{2}}(|000\rangle + |111\rangle)$
 - $n=4$: $|\text{GHZ}_4\rangle = \frac{1}{\sqrt{2}}(|0000\rangle + |1111\rangle)$
@@ -58,6 +59,7 @@ $$
 For $|\text{GHZ}_3\rangle = \frac{1}{\sqrt{2}}(|000\rangle + |111\rangle)$:
 
 **Measuring all qubits in Z-basis:**
+
 - $P(000) = \frac{1}{2}$ - all measure 0
 - $P(111) = \frac{1}{2}$ - all measure 1
 - $P(\text{any other outcome}) = 0$ - impossible!
@@ -109,6 +111,7 @@ $$
 $$
 
 **Examples:**
+
 - $n=3$: $|W_3\rangle = \frac{1}{\sqrt{3}}(|100\rangle + |010\rangle + |001\rangle)$
 - $n=4$: $|W_4\rangle = \frac{1}{2}(|1000\rangle + |0100\rangle + |0010\rangle + |0001\rangle)$
 
@@ -162,6 +165,7 @@ GHZ and W states represent fundamentally different types of entanglement.
 ### LOCC Equivalence
 
 Two states are **LOCC equivalent** (Local Operations and Classical Communication) if one can be transformed into the other using:
+
 - Local quantum operations on individual qubits
 - Classical communication between parties
 
@@ -171,17 +175,18 @@ Two states are **LOCC equivalent** (Local Operations and Classical Communication
 For $n \geq 3$ qubits, GHZ and W states belong to **different entanglement classes**. You cannot convert:
 
 $$
-|\text{GHZ}_n\rangle \not\xrightarrow{\text{LOCC}} |W_n\rangle
+|\text{GHZ}_n\rangle \overset{\text{LOCC}}{\nrightarrow} |W_n\rangle
 $$
 
 $$
-|W_n\rangle \not\xrightarrow{\text{LOCC}} |\text{GHZ}_n\rangle
+|W_n\rangle \overset{\text{LOCC}}{\nrightarrow} |\text{GHZ}_n\rangle
 $$
 
 These represent genuinely different types of multipartite entanglement.
 :::
 
 **Physical interpretation:**
+
 - **GHZ:** Fragile, maximal correlations, "all-or-nothing" entanglement
 - **W:** Robust, partial correlations, "distributed" entanglement
 
@@ -202,6 +207,7 @@ These represent genuinely different types of multipartite entanglement.
 A state has **genuine multipartite entanglement** if it is entangled across all possible bipartitions.
 
 **Example:** $|\text{GHZ}_3\rangle$ is genuinely tripartite entangled:
+
 - Bipartition $1|23$: entangled ✓
 - Bipartition $2|13$: entangled ✓
 - Bipartition $3|12$: entangled ✓
@@ -311,10 +317,12 @@ Distributed structure → robust, partial entanglement.
 ### State Vector Simulation
 
 Classical simulation of $n$-qubit states requires:
+
 - **Memory:** $O(2^n)$ complex numbers
 - **Operations:** $O(2^n)$ per gate
 
 **Limitations:**
+
 - **~45 qubits:** Maximum on world's best supercomputers ($\sim 35$ TB RAM)
 - **50+ qubits:** Classically intractable to simulate in general
 
@@ -323,6 +331,7 @@ This is where quantum computers achieve advantage!
 ### Tensor Network Methods
 
 For certain states (e.g., matrix product states), we can simulate efficiently using **tensor networks**:
+
 - **Memory:** $O(n \chi^2)$ where $\chi$ is bond dimension
 - **Works for:** 1D systems, weakly entangled states, ground states of local Hamiltonians
 

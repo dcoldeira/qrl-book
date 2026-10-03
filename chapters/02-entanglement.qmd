@@ -88,12 +88,12 @@ for any single-qubit states $|\phi\rangle_A$ and $|\chi\rangle_B$.
 The four **Bell states** are the most important entangled states in quantum computing:
 
 $$
-\begin{align*}
+\begin{aligned}
 |\Phi^+\rangle &= \frac{1}{\sqrt{2}}(|00\rangle + |11\rangle) \\[1em]
 |\Phi^-\rangle &= \frac{1}{\sqrt{2}}(|00\rangle - |11\rangle) \\[1em]
 |\Psi^+\rangle &= \frac{1}{\sqrt{2}}(|01\rangle + |10\rangle) \\[1em]
 |\Psi^-\rangle &= \frac{1}{\sqrt{2}}(|01\rangle - |10\rangle)
-\end{align*}
+\end{aligned}
 $$
 
 ### Why Can't Bell States Be Factored?
@@ -165,6 +165,7 @@ $$
 $$
 
 where:
+
 - $\{|u_i\rangle_A\}$ is an orthonormal basis for system A
 - $\{|v_i\rangle_B\}$ is an orthonormal basis for system B
 - $\lambda_i > 0$ are real numbers (Schmidt coefficients) with $\sum_i \lambda_i^2 = 1$
@@ -270,6 +271,7 @@ $$
 All Bell states have Schmidt decomposition with coefficients $\lambda_1 = \lambda_2 = \frac{1}{\sqrt{2}}$.
 
 For example:
+
 - $|\Phi^+\rangle = \frac{1}{\sqrt{2}}|0\rangle|0\rangle + \frac{1}{\sqrt{2}}|1\rangle|1\rangle$
 - $|\Psi^+\rangle = \frac{1}{\sqrt{2}}|0\rangle|1\rangle + \frac{1}{\sqrt{2}}|1\rangle|0\rangle$
 
@@ -431,10 +433,10 @@ Is this state maximally entangled?
 Prove that all four Bell states can be transformed into each other using single-qubit gates (Pauli gates):
 
 $$
-\begin{align*}
+\begin{aligned}
 X|0\rangle = |1\rangle, \quad X|1\rangle = |0\rangle \\
 Z|0\rangle = |0\rangle, \quad Z|1\rangle = -|1\rangle
-\end{align*}
+\end{aligned}
 $$
 
 **Hint:** Start with $|\Phi^+\rangle$ and apply $X$ or $Z$ gates to derive the others.

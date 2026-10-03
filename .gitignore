@@ -1,5 +1,6 @@
 /.quarto/
 /_book/
+/_book-kindle/
 *.qmd.bak
 index.tex
 
