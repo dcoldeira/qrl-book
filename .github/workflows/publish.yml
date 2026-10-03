@@ -35,6 +35,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y fonts-lmodern fonts-dejavu-core fonts-noto-core fonts-symbola
 
+      # Quarto's on-demand package install misses some (e.g. luatexbase), so
+      # install everything the PDF loads up front. One at a time: a bad name
+      # only skips that package.
+      - name: Install LaTeX packages
+        continue-on-error: true
+        run: |
+          for p in luatexbase luaotfload lualibs ctablestack lualatex-math selnolig \
+                   fontspec unicode-math lm koma-script amsmath amsfonts stmaryrd \
+                   fontawesome5 fancyvrb fvextra upquote framed float caption booktabs \
+                   tcolorbox pgf environ trimspaces tikzfill pdfcol bookmark xurl url \
+                   footnotehyper microtype etoolbox epstopdf-pkg xcolor hyperref; do
+            tlmgr install "$p" || echo "skipped $p"
+          done
+
       - name: Render PDF
         id: pdf
         continue-on-error: true
